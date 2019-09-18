@@ -1,11 +1,7 @@
-const BackgroundColor = "#10203c"
-const ForegroundColor = "#ddd"
+import { Display } from './display';
+import { Chip8 } from './chip8';
 
 const canvas = document.getElementById('display');
 const ctx = canvas.getContext('2d');
 
-ctx.fillStyle = BackgroundColor;
-ctx.fillRect(0, 0, 64, 32);
-
-ctx.fillStyle = ForegroundColor;
-ctx.fillRect(0, 0, 8, 5);
+const chip = new Chip8(new Display(ctx));
