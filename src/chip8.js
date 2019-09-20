@@ -6,7 +6,7 @@ export class Chip8 {
 
     load(address, bytes) {
         for(const by in bytes) {
-            this.Memory[address++] = by;
+            this.Memory[address++] = bytes[by];
         }
     }
 
@@ -19,6 +19,38 @@ export class Chip8 {
         this.DelayTimer = 0;
         this.SoundTimer = 0;
         this.display.clear();
+
+        // load font into low memory
+        this.load(0x0, [
+            0xF0, 0x90, 0x90, 0x90, 0xF0,       // 0
+            0x20, 0x60, 0x20, 0x20, 0x70,       // 1
+            0xF0, 0x10, 0xF0, 0x80, 0xF0,       // 2
+            0xF0, 0x10, 0xF0, 0x10, 0xF0,       // 3
+            0x90, 0x90, 0xF0, 0x10, 0x10,       // 4
+            0xF0, 0x80, 0xF0, 0x10, 0xF0,       // 5
+            0xF0, 0x80, 0xF0, 0x90, 0xF0,       // 6
+            0xF0, 0x10, 0x20, 0x40, 0x40,       // 7
+            0xF0, 0x90, 0xF0, 0x90, 0xF0,       // 8
+            0xF0, 0x90, 0xF0, 0x10, 0xF0,       // 9
+            0xF0, 0x90, 0xF0, 0x90, 0x90,       // A
+            0xE0, 0x90, 0xE0, 0x90, 0xE0,       // B
+            0xF0, 0x80, 0x80, 0x80, 0xF0,       // C
+            0xE0, 0x90, 0x90, 0x90, 0xE0,       // D
+            0xF0, 0x80, 0xF0, 0x80, 0xF0,       // E
+            0xF0, 0x80, 0xF0, 0x80, 0x80        // F 
+        ]);
+
+        // test program to display C8 (TODO: remove this)
+        this.load(0x200, [
+            0x60, 0x01,         // LD V0, 1
+            0x61, 0x0c,         // LD V1, $0c
+            0xF1, 0x29,         // LD F, V1
+            0xd0, 0x05,         // DRW V0, V0, 5
+            0x63, 0x06,         // LD V3, $06
+            0x61, 0x08,         // LD V1, $08
+            0xF1, 0x29,         // LD F, V1
+            0xd3, 0x05,         // DRW V3, V0, 5
+        ]);
     }
 
     get state() {
@@ -136,8 +168,14 @@ export class Chip8 {
                 this.PC += 2;
                 break;
             case 0xD000:
-                //Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
-                //The interpreter reads n bytes from memory, starting at the address stored in I. These bytes are then displayed as sprites on screen at coordinates (Vx, Vy). Sprites are XORed onto the existing screen. If this causes any pixels to be erased, VF is set to 1, otherwise it is set to 0. If the sprite is positioned so part of it is outside the coordinates of the display, it wraps around to the opposite side of the screen. See instruction 8xy3 for more information on XOR, and section 2.4, Display, for more information on the Chip-8 screen and sprites.
+                for (let row=0; row<n; row++) {
+                    let pixel = this.Memory[this.I+row];
+                    for (let col=0; col<8; col++) {
+                        if((pixel & (0x80 >> col)) != 0) {
+                            this.display.togglePixel(this.V[x] + col, this.V[y] + row);
+                        }
+                    }
+                }
                 this.PC += 2;
                 break;
             case 0xE000:
@@ -178,9 +216,7 @@ export class Chip8 {
                         this.PC += 2;
                         break;
                     case 0x29:
-                        //Set I = location of sprite for digit Vx.
-                        //The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx. See section 2.4, Display, for more information on the Chip-8 hexadecimal font.
-                        throw new `Opcode ${opcode} not implemented yet`;
+                        this.I = this.V[x] * 5;
                         this.PC += 2;
                         break;
                     case 0x33:
