@@ -10,12 +10,12 @@ export class Display {
 
     clear() {
         this.ctx.fillStyle = backgroundColor;
-        this.ctx.fillRect(0, 0, width, height);
+        this.ctx.fillRect(0, 0, width*16, height*16);
     }
 
     togglePixel(row, col) {
         this.ctx.fillStyle = foregroundColor;
-        this.ctx.fillRect(row, col, 1, 1);
+        this.ctx.fillRect(col*16, row*16, 16, 16);
     }
 }
 

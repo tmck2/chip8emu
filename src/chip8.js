@@ -172,7 +172,7 @@ export class Chip8 {
                     let pixel = this.Memory[this.I+row];
                     for (let col=0; col<8; col++) {
                         if((pixel & (0x80 >> col)) != 0) {
-                            this.display.togglePixel(this.V[x] + col, this.V[y] + row);
+                            this.display.togglePixel(this.V[y] + row, this.V[x] + col);
                         }
                     }
                 }
