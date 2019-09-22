@@ -8,14 +8,21 @@ export class Display {
         this.ctx = ctx;
     }
 
-    clear() {
-        this.ctx.fillStyle = backgroundColor;
-        this.ctx.fillRect(0, 0, width*16, height*16);
-    }
-
-    togglePixel(row, col) {
-        this.ctx.fillStyle = foregroundColor;
-        this.ctx.fillRect(col*16, row*16, 16, 16);
+    repaint(mem) {
+        for (let y=0; y<height; y++)
+        {
+            for (let x=0; x<(width>>3); x++)
+            {
+                for (let i=0; i<8; i++) {
+                    if(mem[y*8+x] & (0x80 >> i)) {
+                        this.ctx.fillStyle = foregroundColor;
+                    } else {
+                        this.ctx.fillStyle = backgroundColor;
+                    }
+                    this.ctx.fillRect((x*8+i)*16, y*16, 16, 16);
+                }
+            }
+        }
     }
 }
 

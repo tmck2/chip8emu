@@ -14,11 +14,12 @@ export class Chip8 {
         this.PC = 0x200;
         this.Stack = [];
         this.Memory = Array(4096);
+        this.DisplayMemory = Array(8*32);
         this.V = Array(15);
         this.I = 0;
-        this.DelayTimer = 0;
-        this.SoundTimer = 0;
-        this.display.clear();
+        this.DT = 0;
+        this.ST = 0;
+        this.display.repaint(this.DisplayMemory);
 
         // load font into low memory
         this.load(0x0, [
@@ -59,8 +60,8 @@ export class Chip8 {
             Stack: this.Stack,
             V: this.V,
             I: this.I,
-            DelayTimer: this.DelayTimer,
-            SoundTimer: this.SoundTimer
+            DT: this.DT,
+            ST: this.ST
         }
     }
 
@@ -168,14 +169,19 @@ export class Chip8 {
                 this.PC += 2;
                 break;
             case 0xD000:
+                this.V[0xF] = 0;
                 for (let row=0; row<n; row++) {
                     let pixel = this.Memory[this.I+row];
                     for (let col=0; col<8; col++) {
                         if((pixel & (0x80 >> col)) != 0) {
-                            this.display.togglePixel(this.V[y] + row, this.V[x] + col);
+                            let by = ((this.V[y] + row) << 3) + (this.V[x] >> 3);
+                            let bi = (this.V[x] + col);
+                            if (bi > 7) by++;
+                            this.DisplayMemory[by] ^= (0x80 >> (bi%8));
                         }
                     }
                 }
+                this.display.repaint(this.DisplayMemory);
                 this.PC += 2;
                 break;
             case 0xE000:
@@ -194,7 +200,7 @@ export class Chip8 {
             case 0xF000:
                 switch (kk) {
                     case 0x07:
-                        this.V[x] = this.DelayTimer;
+                        this.V[x] = this.DT;
                         this.PC += 2;
                         break;
                     case 0x0a:
@@ -204,11 +210,11 @@ export class Chip8 {
                         this.PC += 2;
                         break;
                     case 0x15:
-                        this.DelayTimer = this.V[x];
+                        this.DT = this.V[x];
                         this.PC += 2;
                         break;
                     case 0x18:
-                        this.SoundTimer = this.V[x];
+                        this.ST = this.V[x];
                         this.PC += 2;
                         break;
                     case 0x1e:
