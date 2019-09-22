@@ -1,6 +1,7 @@
 export class Chip8 {
-    constructor(display) {
+    constructor(display, keys) {
         this.display = display;
+        this.keys = keys;
         this.reset();
     }
 
@@ -51,6 +52,7 @@ export class Chip8 {
             0x61, 0x08,         // LD V1, $08
             0xF1, 0x29,         // LD F, V1
             0xd3, 0x05,         // DRW V3, V0, 5
+            0x12, 0x00,         // JP 0x200
         ]);
     }
 
@@ -186,13 +188,9 @@ export class Chip8 {
                 break;
             case 0xE000:
                 if (kk === 0x9e) {
-                    //Skip next instruction if key with the value of Vx is pressed.
-                    //Checks the keyboard, and if the key corresponding to the value of Vx is currently in the down position, PC is increased by 2.
-                    this.PC += 2;
+                    this.PC += (this.keys[this.V[x]]) ? 4 : 2;
                 } else if (kk === 0xA1) {
-                    //Skip next instruction if key with the value of Vx is not pressed.
-                    //Checks the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2.
-                    this.PC += 4;
+                    this.PC += (this.keys[this.V[x]]) ? 2 : 4;
                 } else {
                     throw `Invalid opcode: ${opcode}`;
                 }
@@ -204,9 +202,13 @@ export class Chip8 {
                         this.PC += 2;
                         break;
                     case 0x0a:
-                        //Wait for a key press, store the value of the key in Vx.
-                        //All execution stops until a key is pressed, then the value of that key is stored in Vx.
-                        throw new `Opcode ${opcode} not implemented yet`;
+                        for (;;) {
+                            var key = [...Array(16).keys()].find(scancode => this.keys[scancode]);
+                            if (key) {
+                                this.V[x] = key;
+                                break;
+                            }
+                        }
                         this.PC += 2;
                         break;
                     case 0x15:
