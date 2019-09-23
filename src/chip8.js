@@ -70,13 +70,15 @@ export class Chip8 {
     }
 
     get state() {
-        const fmtreg = r => `0x${('00'+r.toString(16)).substr(-2)}`;
+        const fmtreg = function(val, leadingZeros=2) {
+             return `${('0'.repeat(leadingZeros)+val.toString(16)).substr(-1*leadingZeros)}`;
+        }
 
         const vregs = [...Array(16).keys()]
-            .map(i => `V${i.toString(16)}=${fmtreg(this.V[i])}`)
+            .map(i => `V${i.toString(16)}=0x${fmtreg(this.V[i])}`)
             .join(" "); 
-        const regs = `I=${fmtreg(this.I)} DT=${fmtreg(this.DT)} ST=${fmtreg(this.ST)}`;
-        const ins = `0x${('000'+this.PC.toString(16)).substr(-3)} 0x${('00'+this.Memory[this.PC].toString(16)).substr(-2)}${('00'+this.Memory[this.PC+1].toString(16)).substr(-2)}`
+        const regs = `I=0x${fmtreg(this.I,3)} DT=0x${fmtreg(this.DT)} ST=0x${fmtreg(this.ST)}`;
+        const ins = `0x${fmtreg(this.PC,3)} 0x${fmtreg(this.Memory[this.PC],2)}${fmtreg(this.Memory[this.PC+1],2)}`
 
         return [vregs, regs, ins].join("\r\n");
     }
