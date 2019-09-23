@@ -14,12 +14,13 @@ export class Chip8 {
     reset() {
         this.PC = 0x200;
         this.Stack = [];
-        this.Memory = Array(4096);
-        this.DisplayMemory = Array(8*32);
-        this.V = Array(15);
+        this.Memory = Array(4096).fill(0);
+        this.DisplayMemory = Array(8*32).fill(0);
+        this.V = Array(16).fill(0);
         this.I = 0;
         this.DT = 0;
         this.ST = 0;
+        this.totalEllapsed = 0;
         this.display.repaint(this.DisplayMemory);
 
         // load font into low memory
@@ -42,32 +43,45 @@ export class Chip8 {
             0xF0, 0x80, 0xF0, 0x80, 0x80        // F 
         ]);
 
-        // test program to display C8 (TODO: remove this)
+        // wait routine
+        // register a should contain the duration
+        this.load(0x050, [
+            0xfa, 0x15,         // LD DT, VA
+            0xfa, 0x07,         // LD VA, DT
+            0x3a, 0x00,         // SE VA, 0
+            0x10, 0x52,         // JP 0x052
+            0x00, 0xee,
+        ]);
+
+        // TODO: remove this little test program
         this.load(0x200, [
-            0x60, 0x01,         // LD V0, 1
-            0x61, 0x0c,         // LD V1, $0c
-            0xF1, 0x29,         // LD F, V1
-            0xd0, 0x05,         // DRW V0, V0, 5
-            0x63, 0x06,         // LD V3, $06
-            0x61, 0x08,         // LD V1, $08
-            0xF1, 0x29,         // LD F, V1
-            0xd3, 0x05,         // DRW V3, V0, 5
-            0x12, 0x00,         // JP 0x200
+            0x60, 0x01,         // 0x200 LD V0, 1
+            0x61, 0x0c,         // 0x202 LD V1, $0c
+            0xF1, 0x29,         // 0x204 LD F, V1
+            0xd0, 0x05,         // 0x206 DRW V0, V0, 5
+            0x63, 0x06,         // 0x208 LD V3, $06
+            0x61, 0x08,         // 0x20a LD V1, $08
+            0xF1, 0x29,         // 0x20c LD F, V1
+            0xd3, 0x05,         // 0x20e DRW V3, V0, 5
+            0x6a, 0x20,         // 0x210 LD VA, $20
+            0x20, 0x50,         // 0x212 Call delay routine
+            0x12, 0x00,         // 0x214 JP 0x200
         ]);
     }
 
     get state() {
-        return {
-            PC: this.PC,
-            Stack: this.Stack,
-            V: this.V,
-            I: this.I,
-            DT: this.DT,
-            ST: this.ST
-        }
+        const fmtreg = r => `0x${('00'+r.toString(16)).substr(-2)}`;
+
+        const vregs = [...Array(16).keys()]
+            .map(i => `V${i.toString(16)}=${fmtreg(this.V[i])}`)
+            .join(" "); 
+        const regs = `I=${fmtreg(this.I)} DT=${fmtreg(this.DT)} ST=${fmtreg(this.ST)}`;
+        const ins = `0x${('000'+this.PC.toString(16)).substr(-3)} 0x${('00'+this.Memory[this.PC].toString(16)).substr(-2)}${('00'+this.Memory[this.PC+1].toString(16)).substr(-2)}`
+
+        return [vregs, regs, ins].join("\r\n");
     }
 
-    advanceEmulator() {
+    advanceEmulator(ellapsed) {
         const opcode = this.Memory[this.PC] << 8 | this.Memory[this.PC+1];
         const n = opcode & 0x000f;
         const x = (opcode >> 8) & 0x0f;
@@ -82,7 +96,7 @@ export class Chip8 {
                 } else if (opcode === 0x00ee) {
                     this.PC = this.Stack.pop();
                 } else {
-                    throw `Invalid opcode: ${this.opcode}`;
+                    console.log(`Ignoring Invalid opcode: ${this.opcode}`);
                 }
                 this.PC += 2;
                 break;
@@ -228,20 +242,20 @@ export class Chip8 {
                         this.PC += 2;
                         break;
                     case 0x33:
-                        this.Memory[I]   = (this.V[x] % 1000) / 100; // hundred's
-                        this.Memory[I+1] = (this.V[x] % 100) / 10;   // ten's
-                        this.Memory[I+2] = (this.V[x] % 10);         // one's
+                        this.Memory[this.I]   = (this.V[x] % 1000) / 100; // hundred's
+                        this.Memory[this.I+1] = (this.V[x] % 100) / 10;   // ten's
+                        this.Memory[this.I+2] = (this.V[x] % 10);         // one's
                         this.PC += 2;
                         break;
                     case 0x55:
                         for (let i=0; i<=x; i++) {
-                            this.Memory[I+i] = this.V[i];
+                            this.Memory[this.I+i] = this.V[i];
                         }
                         this.PC += 2;
                         break;
                     case 0x65:
                         for (let i=0; i<=x; i++) {
-                            this.V[i] = this.Memory[I+i];
+                            this.V[i] = this.Memory[this.I+i];
                         }
                         this.PC += 2;
                         break;
@@ -249,8 +263,17 @@ export class Chip8 {
                         throw new `Invalid opcode: ${opcode}`;
                 }
         }
+
+        this.updateTimers(ellapsed);
     }
 
-    updateTimers() {
+    updateTimers(ellapsed) {
+        this.totalEllapsed += ellapsed;
+        if (this.totalEllapsed > 16) {
+            if (this.DT > 0) this.DT--;
+            if (this.ST > 0) this.ST--;
+            this.totalEllapsed = 0;
+        }
     }
 }
+
