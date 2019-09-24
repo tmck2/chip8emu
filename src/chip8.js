@@ -42,31 +42,6 @@ export class Chip8 {
             0xF0, 0x80, 0xF0, 0x80, 0xF0,       // E
             0xF0, 0x80, 0xF0, 0x80, 0x80        // F 
         ]);
-
-        // wait routine
-        // register a should contain the duration
-        this.load(0x050, [
-            0xfa, 0x15,         // LD DT, VA
-            0xfa, 0x07,         // LD VA, DT
-            0x3a, 0x00,         // SE VA, 0
-            0x10, 0x52,         // JP 0x052
-            0x00, 0xee,
-        ]);
-
-        // TODO: remove this little test program
-        this.load(0x200, [
-            0x60, 0x01,         // 0x200 LD V0, 1
-            0x61, 0x0c,         // 0x202 LD V1, $0c
-            0xF1, 0x29,         // 0x204 LD F, V1
-            0xd0, 0x05,         // 0x206 DRW V0, V0, 5
-            0x63, 0x06,         // 0x208 LD V3, $06
-            0x61, 0x08,         // 0x20a LD V1, $08
-            0xF1, 0x29,         // 0x20c LD F, V1
-            0xd3, 0x05,         // 0x20e DRW V3, V0, 5
-            0x6a, 0x20,         // 0x210 LD VA, $20
-            0x20, 0x50,         // 0x212 Call delay routine
-            0x12, 0x00,         // 0x214 JP 0x200
-        ]);
     }
 
     get state() {
@@ -123,7 +98,7 @@ export class Chip8 {
                 this.PC += 2;
                 break;
             case 0x7000:
-                this.V[x] = this.V[x] + kk;
+                this.V[x] = (this.V[x] + kk) & 0xff;
                 this.PC += 2;
                 break;
             case 0x8000:
@@ -152,7 +127,7 @@ export class Chip8 {
                         break;
                     case 5:
                         this.V[0xf] = this.V[y] > this.V[x] ? 1 : 0;
-                        this.V[x] = this.V[x] - this.V[y];
+                        this.V[x] = (this.V[x] - this.V[y]) & 0xff;
                         this.PC += 2;
                         break;
                     case 6:
@@ -192,10 +167,14 @@ export class Chip8 {
                     let pixel = this.Memory[this.I+row];
                     for (let col=0; col<8; col++) {
                         if((pixel & (0x80 >> col)) != 0) {
-                            let by = ((this.V[y] + row) << 3) + (this.V[x] >> 3);
-                            let bi = (this.V[x] + col);
-                            if (bi > 7) by++;
-                            this.DisplayMemory[by] ^= (0x80 >> (bi%8));
+                            const dstCol = this.V[x];
+                            const dstRow = this.V[y];
+                            let by = Math.floor((dstRow + row) * 8 + (dstCol + col) / 8);
+                            let bi = (dstCol + col) % 8;
+                            if (this.DisplayMemory[by] & (0x80 >> bi)) {
+                                this.V[0xf] = 1;
+                            }
+                            this.DisplayMemory[by] ^= (0x80 >> bi);
                         }
                     }
                 }
@@ -244,9 +223,9 @@ export class Chip8 {
                         this.PC += 2;
                         break;
                     case 0x33:
-                        this.Memory[this.I]   = (this.V[x] % 1000) / 100; // hundred's
-                        this.Memory[this.I+1] = (this.V[x] % 100) / 10;   // ten's
-                        this.Memory[this.I+2] = (this.V[x] % 10);         // one's
+                        this.Memory[this.I]   = ((this.V[x] % 1000) / 100) & 0xff ; // hundred's
+                        this.Memory[this.I+1] = ((this.V[x] % 100) / 10) & 0xff;     // ten's
+                        this.Memory[this.I+2] = ((this.V[x] % 10)) & 0xff;           // one's
                         this.PC += 2;
                         break;
                     case 0x55:
