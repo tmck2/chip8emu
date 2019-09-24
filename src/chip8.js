@@ -59,6 +59,16 @@ export class Chip8 {
     }
 
     advanceEmulator(ellapsed) {
+        if (this.waitingForKey != undefined) {
+            let key = [...Array(16).keys()].find(code => this.keys[code]);
+            if (key) {
+                this.V[this.waitingForKey] = key;
+                delete this.waitingForKey;
+                this.PC+=2;
+            }
+            return;
+        }
+
         const opcode = this.Memory[this.PC] << 8 | this.Memory[this.PC+1];
         const n = opcode & 0x000f;
         const x = (opcode >> 8) & 0x0f;
@@ -69,7 +79,8 @@ export class Chip8 {
         switch (opcode & 0xf000) {
             case 0x0000:
                 if (opcode === 0x00e0) {
-                    this.display.clear();
+                    this.DisplayMemory = Array(8*32).fill(0);
+                    this.display.repaint(this.DisplayMemory);
                 } else if (opcode === 0x00ee) {
                     this.PC = this.Stack.pop();
                 } else {
@@ -197,14 +208,7 @@ export class Chip8 {
                         this.PC += 2;
                         break;
                     case 0x0a:
-                        for (;;) {
-                            var key = [...Array(16).keys()].find(scancode => this.keys[scancode]);
-                            if (key) {
-                                this.V[x] = key;
-                                break;
-                            }
-                        }
-                        this.PC += 2;
+                        this.waitingForKey = x;
                         break;
                     case 0x15:
                         this.DT = this.V[x];
@@ -224,8 +228,8 @@ export class Chip8 {
                         break;
                     case 0x33:
                         this.Memory[this.I]   = ((this.V[x] % 1000) / 100) & 0xff ; // hundred's
-                        this.Memory[this.I+1] = ((this.V[x] % 100) / 10) & 0xff;     // ten's
-                        this.Memory[this.I+2] = ((this.V[x] % 10)) & 0xff;           // one's
+                        this.Memory[this.I+1] = ((this.V[x] % 100) / 10) & 0xff;    // ten's
+                        this.Memory[this.I+2] = ((this.V[x] % 10)) & 0xff;          // one's
                         this.PC += 2;
                         break;
                     case 0x55:
