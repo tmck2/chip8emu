@@ -1,56 +1,72 @@
 import { Display } from './display';
+import { Buzzer } from './buzzer';
+import { keys } from './keys';
 import { Chip8 } from './chip8';
+
+const games = [
+    { name: "Tetris", url: "TETRIS.dms" },
+    { name: "Invaders", url: "INVADERS.dms" }, 
+    { name: "Floppy Bird", url: "floppybird.rom" },
+    { name: "Lunar Lander", url: "lunar_lander.ch8" }
+]
+
+let cancelToken;
 
 const canvas = document.getElementById('display');
 const ctx = canvas.getContext('2d');
 
-const keys = Array(16).fill(0);
+games.map(g => {
+    let option = document.createElement("option");
+    option.text = g.name;
+    option.value = g.url;
+    return option;
+}).forEach(o => {
+    document.getElementById("program-select").append(o);
+});
 
-window.chip = new Chip8(new Display(ctx), keys);
+document.getElementById("load-button")
+    .addEventListener("click", e => {
+        const url = document.getElementById("program-select").value;
+        if (url) {
+            loadProgram(url);
+        }
+    });
 
-var oReq = new XMLHttpRequest();
-//oReq.open("GET", "TETRIS.dms", true);
-oReq.open("GET", "INVADERS.dms", true);
-oReq.responseType = "arraybuffer";
+function loadProgram(url) {
+    var oReq = new XMLHttpRequest();
+    oReq.open("GET", url, true);
+    oReq.responseType = "arraybuffer";
 
-oReq.onload = function(_) {
-    let arrayBuffer = oReq.response;
-    if (arrayBuffer) {
-        let program = new Uint8Array(arrayBuffer);
-        window.chip.load(0x200, program);
-        setTimeout(mainloop, 0);
-    }
-};
+    window.chip = new Chip8(new Display(ctx),
+        new Buzzer(new (window.AudioContext || window.webkitAudioContext)),
+        keys);
 
-oReq.send(null);
+    oReq.onload = function(_) {
+        console.log("1");
+        clearTimeout(cancelToken);
+
+        let arrayBuffer = oReq.response;
+        if (arrayBuffer) {
+            let program = new Uint8Array(arrayBuffer);
+            chip.reset();
+            chip.load(0x200, program);
+            cancelToken = setTimeout(mainloop, 0);
+        }
+    };
+
+    oReq.send(null);
+}
 
 let start;
 function mainloop() {
     for (let i=0; i<5; i++) {
         if (!start) start = new Date();
 
-        window.chip.advanceEmulator(new Date()-start);
+        chip.advanceEmulator(new Date()-start);
 
         start = new Date();
     }
 
-    setTimeout(mainloop, 0);
+    cancelToken = setTimeout(mainloop, 0);
 }
 
-const keymap = [];
-keymap[49] = 0x1; keymap[50] = 0x2; keymap[51] = 0x3; keymap[52] = 0xC;
-keymap[81] = 0x4; keymap[87] = 0x5; keymap[69] = 0x6; keymap[82] = 0xD;
-keymap[65] = 0x7; keymap[83] = 0x8; keymap[68] = 0x9; keymap[70] = 0xE;
-keymap[90] = 0xA; keymap[88] = 0x0; keymap[67] = 0xB; keymap[86] = 0xF;
-
-document.addEventListener('keydown', e => {
-    if (keymap[e.keyCode]) {
-        keys[keymap[e.keyCode]] = 1;
-    }
-});
-
-document.addEventListener('keyup', e => {
-    if (keymap[e.keyCode]) {
-        keys[keymap[e.keyCode]] = 0;
-    }
-});

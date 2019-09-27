@@ -1,6 +1,7 @@
 export class Chip8 {
-    constructor(display, keys) {
+    constructor(display, buzzer, keys) {
         this.display = display;
+        this.buzzer = buzzer;
         this.keys = keys;
         this.reset();
     }
@@ -256,7 +257,12 @@ export class Chip8 {
         this.totalEllapsed += ellapsed;
         if (this.totalEllapsed > 16) {
             if (this.DT > 0) this.DT--;
-            if (this.ST > 0) this.ST--;
+            if (this.ST > 0) {
+                this.buzzer.on();
+                this.ST--;
+            } else {
+                this.buzzer.off();
+            }
             this.totalEllapsed = 0;
         }
     }
