@@ -11,21 +11,25 @@ Pick a game and click load
 
 The Chip8 keys:
 
+<pre>
 <code>
 1 2 3 C
 4 5 6 D
 7 8 9 E
 A 0 B F
 </code>
+</pre>
 
 Are mapped to the PC keybaord as follows:
 
+<pre>
 <code>
 1 2 3 4
 Q W E R
 A S D F
 Z X C V
 </code>
+</pre>
 
 ## TODO
 * Show state of VM
