@@ -1,5 +1,5 @@
-const backgroundColor = "#10203c";
-const foregroundColor = "#ddd";
+const backgroundColor = "#9bbc0f";
+const foregroundColor = "#10203c";
 const width = 64;
 const height = 32;
 
