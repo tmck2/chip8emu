@@ -4,10 +4,11 @@ import { keys } from './keys';
 import { Chip8 } from './chip8';
 
 const games = [
-    { name: "Tetris", url: "TETRIS.dms" },
-    { name: "Invaders", url: "INVADERS.dms" }, 
-    { name: "Floppy Bird", url: "floppybird.rom" },
-    { name: "Lunar Lander", url: "lunar_lander.ch8" }
+    { name: "F8Z", url: "roms/f8z.ch8" },
+    { name: "Tetris", url: "roms/TETRIS.dms" },
+    { name: "Invaders", url: "roms/INVADERS.dms" },
+    { name: "Floppy Bird", url: "roms/floppybird.rom" },
+    { name: "Lunar Lander", url: "roms/lunar_lander.ch8" }
 ]
 
 let cancelToken;
@@ -59,7 +60,7 @@ function loadProgram(url) {
 
 let start;
 function mainloop() {
-    for (let i=0; i<5; i++) {
+    for (let i=0; i<100; i++) {
         if (!start) start = new Date();
 
         chip.advanceEmulator(new Date()-start);
