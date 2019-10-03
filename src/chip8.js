@@ -41,7 +41,7 @@ export class Chip8 {
             new OpCode('LD I, nnn',    x => (x.opcode & 0xf000) === 0xa000,                 x => `LD I, ${x.nnn}`,            x => this.ld_I_nnn.call(this,x),
             new OpCode('JP V0, nnn',   x => (x.opcode & 0xf000) === 0xb000,                 x => `JP V0, ${x.nnn}`,           x => this.jp_V0_nnn.call(this,x))),
             new OpCode('RND Vx, kk',   x => (x.opcode & 0xf000) === 0xc000,                 x => `RND V${x.x}, ${x.kk}`,      x => this.rnd_Vx_kk.call(this,x)),
-            new OpCode('DRW Vx, Vy, n',x => (x.opcode & 0xf000) === 0xd000,                 x => `DRW V${x.x}, V${x.y}, x.n`, x => this.drw_Vx_Vy.call(this,x)),
+            new OpCode('DRW Vx, Vy, n',x => (x.opcode & 0xf000) === 0xd000,                 x => `DRW V${x.x}, V${x.y}, ${x.n}`, x => this.drw_Vx_Vy.call(this,x)),
             new OpCode('SKP Vx',       x => (x.opcode & 0xf000) === 0xe000 && x.kk == 0x9e, x => `SKP V${x.x}`,               x => this.skp_Vx.call(this,x)),
             new OpCode('SKNP Vx',      x => (x.opcode & 0xf000) === 0xe000 && x.kk == 0xa1, x => `SKNP V${x.x}`,              x => this.sknp_Vx.call(this,x)),
             new OpCode('LD Vx, DT',    x => (x.opcode & 0xf000) === 0xf000 && x.kk == 0x07, x => `LD V${x.x}, DT`,            x => this.ld_Vx_DT.call(this,x)),
@@ -110,6 +110,30 @@ export class Chip8 {
         return [vregs, regs, ins].join("\r\n");
     }
 
+    disasm(addr, len) {
+        const result = [];
+        for (let curr=addr; curr < addr+len; curr+=2) {
+            let addr1 = curr & 0xfff;
+            let addr2 = (curr+1) & 0xfff;
+
+            const opcode = this.Memory[addr1] << 8 | this.Memory[addr2];
+            const n = opcode & 0x000f;
+            const x = (opcode >> 8) & 0x0f;
+            const y = (opcode >> 4) & 0x0f;
+            const kk = opcode & 0xff;
+            const nnn = opcode & 0x0fff;
+
+            window.ops = this._ops;
+            let op = this._ops.find(x => x.isMatch({opcode,n,x,y,kk,nnn}));
+            if (op) {
+                result.push(`0x${curr.toString(16)} ${op.disasm({n,kk,x,y,nnn})}`)
+            } else {
+                result.push(`0x${curr.toString(16)} 0x${this.Memory[addr1].toString(16)} 0x${this.Memory[addr2].toString(16)}`)
+            }
+        }
+        return result;
+    }
+
     advanceEmulator(ellapsed) {
         if (this.waitingForKey != undefined) {
             let key = [...Array(16).keys()].find(code => this.keys[code]);
@@ -134,7 +158,6 @@ export class Chip8 {
             op.exec({opcode,n,x,y,kk,nnn});
         } else {
             console.log(`unknown opcode: 0x${opcode.toString(16)}`);
-            debugger;
             this.PC += 2;
         }
 
