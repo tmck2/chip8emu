@@ -60,7 +60,9 @@ function loadProgram(url) {
 
 let start;
 function mainloop() {
-    for (let i=0; i<100; i++) {
+    const cyclesPerFrame = document.getElementById('speed').value;
+
+    for (let i=0; i<cyclesPerFrame; i++) {
         if (!start) start = new Date();
 
         chip.advanceEmulator(new Date()-start);

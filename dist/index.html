@@ -2,12 +2,7 @@
 <html>
 <head>
 <title>Chip8 Emulator</title>
-<style>
-canvas {
-  width: 512px;
-  height: 256px;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="app.css" />
 </head>
 <body>
 <canvas id="display" width="1024" height="512"></canvas>
@@ -16,6 +11,12 @@ canvas {
         <option value="" disabled selected>Select a program</option>
     </select>
     <button id="load-button">Load</button>
+    <div class="slidercontainer">
+        <div>
+            <label for="speed">Cycles/Frame:</label>
+        </div>
+        <input type="range" class="slider" min="1" max="100" value="15" id="speed" />
+    </div>
 <div>
 <pre id="debug">
 </pre>
