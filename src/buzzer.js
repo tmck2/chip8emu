@@ -1,11 +1,9 @@
 export class Buzzer {
-    constructor(context) {
-        // create web audio api context
-        this.context = context;
+    // Call init in response to a click
+    init() {
+        this.context = new (window.AudioContext || window.webkitAudioContext);
 
-        // create Oscillator node
         this.oscillator = this.context.createOscillator();
-
         this.oscillator.type = 'square';
         this.oscillator.frequency.setValueAtTime(100, this.context.currentTime); // value in hertz
         this.oscillator.connect(this.context.destination);
@@ -13,11 +11,14 @@ export class Buzzer {
     }
 
     on() {
-        console.log('on');
-        this.oscillator.connect(this.context.destination);
+        if (this.oscillator) {
+            this.oscillator.connect(this.context.destination);
+        }
     }
 
     off() {
-        this.oscillator.disconnect();
+        if (this.oscillator) {
+            this.oscillator.disconnect();
+        }
     }
 }

@@ -9,12 +9,19 @@ const games = [
     { name: "Invaders", url: "roms/INVADERS.dms" },
     { name: "Floppy Bird", url: "roms/floppybird.rom" },
     { name: "Lunar Lander", url: "roms/lunar_lander.ch8" }
-]
+];
 
 let cancelToken;
 
 const canvas = document.getElementById('display');
 const ctx = canvas.getContext('2d');
+const buzzer = new Buzzer();
+
+const chip = new Chip8(new Display(ctx), buzzer, keys);
+
+// expose chip for debugging purposes
+window.buzzer = buzzer;
+window.chip = chip;
 
 games.map(g => {
     let option = document.createElement("option");
@@ -29,21 +36,23 @@ document.getElementById("load-button")
     .addEventListener("click", e => {
         const url = document.getElementById("program-select").value;
         if (url) {
+            buzzer.init();
             loadProgram(url);
         }
     });
 
+document.getElementById('speed').addEventListener('input', e => {
+    chip.cyclesPerFrame = e.target.value;
+});
+
 function loadProgram(url) {
-    var oReq = new XMLHttpRequest();
+    const oReq = new XMLHttpRequest();
     oReq.open("GET", url, true);
     oReq.responseType = "arraybuffer";
 
-    window.chip = new Chip8(new Display(ctx),
-        new Buzzer(new (window.AudioContext || window.webkitAudioContext)),
-        keys);
+    chip.singleStep = true;
 
     oReq.onload = function(_) {
-        console.log("1");
         clearTimeout(cancelToken);
 
         let arrayBuffer = oReq.response;
@@ -51,25 +60,9 @@ function loadProgram(url) {
             let program = new Uint8Array(arrayBuffer);
             chip.reset();
             chip.load(0x200, program);
-            cancelToken = setTimeout(mainloop, 0);
+            chip.singleStep = false;
         }
     };
 
     oReq.send(null);
 }
-
-let start;
-function mainloop() {
-    const cyclesPerFrame = document.getElementById('speed').value;
-
-    for (let i=0; i<cyclesPerFrame; i++) {
-        if (!start) start = new Date();
-
-        chip.advanceEmulator(new Date()-start);
-
-        start = new Date();
-    }
-
-    cancelToken = setTimeout(mainloop, 0);
-}
-

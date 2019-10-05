@@ -15,7 +15,9 @@ export class Chip8 {
         this.display = display;
         this.buzzer = buzzer;
         this.keys = keys;
+        this.cyclesPerFrame = 15;
         this.reset();
+        this.go();
 
         this._ops = [
             new OpCode('CLS',          x => x.opcode === 0x00e0,                            _ => 'CLS',                       x => this.cls.call(this,x)),
@@ -73,6 +75,7 @@ export class Chip8 {
         this.DT = 0;
         this.ST = 0;
         this.totalEllapsed = 0;
+        this.singleStep = true;
         this.display.repaint(this.DisplayMemory);
 
         // load font into low memory
@@ -105,7 +108,7 @@ export class Chip8 {
             .map(i => `V${i.toString(16)}=0x${fmtreg(this.V[i])}`)
             .join(" "); 
         const regs = `I=0x${fmtreg(this.I,3)} DT=0x${fmtreg(this.DT)} ST=0x${fmtreg(this.ST)}`;
-        const ins = `0x${fmtreg(this.PC,3)} 0x${fmtreg(this.Memory[this.PC],2)}${fmtreg(this.Memory[this.PC+1],2)}`
+        const ins = `${this.disasm(this.PC,1)[0]}`
 
         return [vregs, regs, ins].join("\r\n");
     }
@@ -134,7 +137,23 @@ export class Chip8 {
         return result;
     }
 
-    advanceEmulator(ellapsed) {
+    go() {
+        // update timers whether in single step mode or not so that buzzer does not get stuck on
+        if (!this.start) this.start = new Date();
+        this.updateTimers(new Date() - this.start);
+
+        if (!this.singleStep)
+        {
+            for (let i=0; i<this.cyclesPerFrame; i++) {
+                chip.stepEmulator(new Date()-this.start);
+            }
+        }
+
+        this.start = new Date();
+        setTimeout(x => this.go.call(this), 0);
+    }
+
+    stepEmulator() {
         if (this.waitingForKey != undefined) {
             let key = [...Array(16).keys()].find(code => this.keys[code]);
             if (key) {
@@ -145,35 +164,40 @@ export class Chip8 {
             return;
         }
 
-        const opcode = this.Memory[this.PC] << 8 | this.Memory[this.PC+1];
+        let instruction = this.fetch(this.PC);
+
+        window.ops = this._ops;
+        let op = this._ops.find(x => x.isMatch(instruction));
+        if (op) {
+            op.exec(instruction);
+        } else {
+            console.log("unknown instruction", instruction);
+            this.PC += 2;
+        }
+    }
+
+    fetch(addr) {
+        const opcode = this.Memory[addr] << 8 | this.Memory[(addr+1)&0xfff];
         const n = opcode & 0x000f;
         const x = (opcode >> 8) & 0x0f;
         const y = (opcode >> 4) & 0x0f;
         const kk = opcode & 0xff;
         const nnn = opcode & 0x0fff;
 
-        window.ops = this._ops;
-        let op = this._ops.find(x => x.isMatch({opcode,n,x,y,kk,nnn}));
-        if (op) {
-            op.exec({opcode,n,x,y,kk,nnn});
-        } else {
-            console.log(`unknown opcode: 0x${opcode.toString(16)}`);
-            this.PC += 2;
-        }
-
-        this.updateTimers(ellapsed);
+        return { opcode, n, x, y, kk, nnn };
     }
 
     updateTimers(ellapsed) {
+        if (this.ST > 0) {
+            this.buzzer.on();
+        } else {
+            this.buzzer.off();
+        }
+
         this.totalEllapsed += ellapsed;
         if (this.totalEllapsed > 16) {
             if (this.DT > 0) this.DT--;
-            if (this.ST > 0) {
-                this.buzzer.on();
-                this.ST--;
-            } else {
-                this.buzzer.off();
-            }
+            if (this.ST > 0) this.ST--;
             this.totalEllapsed = 0;
         }
     }
