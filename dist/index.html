@@ -5,21 +5,7 @@
 <link rel="stylesheet" type="text/css" href="app.css" />
 </head>
 <body>
-<canvas id="display" width="1024" height="512"></canvas>
-<div id="config-panel">
-    <select id="program-select">
-        <option value="" disabled selected>Select a program</option>
-    </select>
-    <button id="load-button">Load</button>
-    <div class="slidercontainer">
-        <div>
-            <label for="speed">Cycles/Frame:</label>
-        </div>
-        <input type="range" class="slider" min="1" max="100" value="15" id="speed" />
-    </div>
-<div>
-<pre id="debug">
-</pre>
+<div id="app"></div>
 <script src="bundle.js"></script>
 </body>
 </html>

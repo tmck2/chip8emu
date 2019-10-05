@@ -8,13 +8,25 @@
     "start": "webpack-dev-server --open",
     "build": "webpack"
   },
+  "presets": [
+    "@babel/preset-env",
+    "@babel/preset-react"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.6.2",
+    "@babel/preset-react": "^7.0.0",
+    "babel": "^6.23.0",
+    "babel-loader": "^8.0.6",
     "webpack": "^4.40.2",
     "webpack-cli": "^3.3.9",
     "webpack-dev-server": "^3.8.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "babel-preset-react": "^6.24.1",
+    "react": "^16.10.2",
+    "react-dom": "^16.10.2"
+  }
 }

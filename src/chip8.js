@@ -11,8 +11,7 @@ class OpCode {
 }
 
 export class Chip8 {
-    constructor(display, buzzer, keys) {
-        this.display = display;
+    constructor(buzzer, keys) {
         this.buzzer = buzzer;
         this.keys = keys;
         this.cyclesPerFrame = 15;
@@ -58,10 +57,19 @@ export class Chip8 {
         ];
     }
 
+    connectDisplay(display) {
+        this.display = display;
+    }
 
     load(address, bytes) {
         for(const by in bytes) {
             this.Memory[address++] = bytes[by];
+        }
+    }
+
+    repaint() {
+        if (this.display) {
+            this.display.repaint();
         }
     }
 
@@ -76,7 +84,7 @@ export class Chip8 {
         this.ST = 0;
         this.totalEllapsed = 0;
         this.singleStep = true;
-        this.display.repaint(this.DisplayMemory);
+        this.repaint();
 
         // load font into low memory
         this.load(0x0, [
@@ -145,7 +153,7 @@ export class Chip8 {
         if (!this.singleStep)
         {
             for (let i=0; i<this.cyclesPerFrame; i++) {
-                chip.stepEmulator(new Date()-this.start);
+                this.stepEmulator(new Date()-this.start);
             }
         }
 
@@ -204,7 +212,7 @@ export class Chip8 {
 
     cls() {
         this.DisplayMemory = Array(8*32).fill(0);
-        this.display.repaint(this.DisplayMemory);
+        this.repaint();
         this.PC += 2;
     }
 
@@ -335,7 +343,7 @@ export class Chip8 {
                 }
             }
         }
-        this.display.repaint(this.DisplayMemory);
+        this.repaint();
         this.PC += 2;
     }
 
