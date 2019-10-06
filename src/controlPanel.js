@@ -4,7 +4,7 @@ export class ControlPanel extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {selectedUrl: '', speed: 15}
+        this.state = {selectedUrl: ''}
     }
 
     render() {
@@ -26,11 +26,7 @@ export class ControlPanel extends React.Component {
                     <div>
                         <label htmlFor="speed">Cycles/Frame:</label>
                     </div>
-                    <select id="speed" value={this.state.speed} onChange={e => {
-                        const speed = e.target.value;
-                        this.setState({speed});
-                        this.props.speedChanged(speed);
-                    }}>
+                    <select id="speed" value={this.props.speed} onChange={e => this.props.speedChanged(e.target.value)}>
                         <option value={1}>1 cycle/frame</option>
                         <option value={3}>3 cycle/frame</option>
                         <option value={7}>7 cycle/frame</option>

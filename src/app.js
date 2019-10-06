@@ -5,7 +5,7 @@ import {keys} from './keys';
 import {Chip8} from './chip8';
 import {Display} from './display';
 import {ControlPanel} from "./controlPanel";
-import {Disasm} from "./disasm";
+import {Monitor} from "./monitor";
 
 const programs = [
     { name: "F8Z", url: "roms/f8z.ch8" },
@@ -13,7 +13,7 @@ const programs = [
     { name: "Invaders", url: "roms/INVADERS.dms" },
     { name: "Floppy Bird", url: "roms/floppybird.rom" },
     { name: "Lunar Lander", url: "roms/lunar_lander.ch8" },
-    { name: "Blinky", url: "roms/BLINKY.dms" }
+    { name: "Blinky", url: "roms/BLINKY.dms", instructions: "A - Left, S - Right, E - Up, D - Down" }
 ];
 
 class App extends React.Component {
@@ -23,7 +23,10 @@ class App extends React.Component {
         this.buzzer = new Buzzer();
         this.chip = new Chip8(this.buzzer, keys);
 
+        // for debugging
         window.chip = this.chip;
+
+        this.state = {selectedProgram: undefined, speed: 15};
     }
 
     loadProgram = (url) => {
@@ -54,14 +57,15 @@ class App extends React.Component {
 
     updateSpeed = (cyclesPerFrame) => {
         this.chip.cyclesPerFrame = cyclesPerFrame;
+        this.setState({speed: cyclesPerFrame});
     }
 
     render() {
        return (
             <div>
                <Display chip={this.chip} />
-               <Disasm chip={this.chip} />
-               <ControlPanel programs={programs} loadProgram={this.loadProgram} speedChanged={this.updateSpeed} onGo={this.go} onBreak={this.break} onStep={this.step} />
+               <Monitor chip={this.chip} />
+               <ControlPanel programs={programs} loadProgram={this.loadProgram} speed={this.state.speed} speedChanged={this.updateSpeed} onGo={this.go} onBreak={this.break} onStep={this.step} />
            </div>);
     }
 }

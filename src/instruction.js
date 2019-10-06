@@ -21,9 +21,15 @@ export class InstructionFactory {
         const args = { n, x, y, kk, nnn };
 
         const instruction = this._instructions.find(x => x.isMatch({machineCode,n,x,y,kk,nnn}));
+        if (!instruction) {
+            return {
+                disasm: () => `0x${machineCode.toString(16)}`,
+                exec: chip => { console.log(`Unknown opcode: ${machineCode}`); chip.PC += 2; }
+            };
+        }
 
         return {
-            disasm: () => instruction ? instruction.disasm(args) : `0x${machineCode.toString(16)}`,
+            disasm: () => instruction.disasm(args),
             exec: chip => {
                 instruction.exec(chip, args);
                 chip.PC &= 0xfff;

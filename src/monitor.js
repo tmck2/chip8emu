@@ -5,7 +5,7 @@ const foregroundColor = "#000";
 const displayWidth = 320;
 const displayHeight = 320;
 
-export class Disasm extends React.Component {
+export class Monitor extends React.Component {
     xo = 8;
     yo = 12;
     cy = 12;
