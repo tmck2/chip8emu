@@ -4,6 +4,7 @@ export class Chip8 {
     constructor(buzzer, keys) {
         this.buzzer = buzzer;
         this.keys = keys;
+        this.framesPerSecond = 60;
         this.cyclesPerFrame = 15;
         this.reset();
         this.mainLoop();
@@ -85,7 +86,7 @@ export class Chip8 {
         }
 
         this.start = new Date();
-        setTimeout(x => this.mainLoop.call(this), 0);
+        setTimeout(x => this.mainLoop.call(this), 1000/this.framesPerSecond);
     }
 
     stepEmulator() {

@@ -24,7 +24,10 @@ export class InstructionFactory {
 
         return {
             disasm: () => instruction ? instruction.disasm(args) : `0x${machineCode.toString(16)}`,
-            exec: chip => instruction.exec(chip, args)
+            exec: chip => {
+                instruction.exec(chip, args);
+                chip.PC &= 0xfff;
+            }
         };
     }
 
