@@ -20,6 +20,8 @@ class App extends React.Component {
 
         this.buzzer = new Buzzer();
         this.chip = new Chip8(this.buzzer, keys);
+
+        window.chip = this.chip;
     }
 
     loadProgram = (url) => {
@@ -36,12 +38,15 @@ class App extends React.Component {
                 let program = new Uint8Array(arrayBuffer);
                 this.chip.reset();
                 this.chip.load(0x200, program);
-                this.chip.singleStep = false;
             }
         };
 
         oReq.send(null);
     }
+
+    go = () => { this.chip.singleStep = false; };
+
+    break = () => { this.chip.singleStep = true; };
 
     updateSpeed = (cyclesPerFrame) => {
         this.chip.cyclesPerFrame = cyclesPerFrame;
@@ -51,7 +56,7 @@ class App extends React.Component {
        return (
             <div>
                <Display chip={this.chip} />
-               <ControlPanel programs={programs} loadProgram={this.loadProgram} speedChanged={this.updateSpeed} />
+               <ControlPanel programs={programs} loadProgram={this.loadProgram} speedChanged={this.updateSpeed} onGo={this.go} onBreak={this.break} />
            </div>);
     }
 }

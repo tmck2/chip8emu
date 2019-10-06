@@ -16,17 +16,29 @@ export class ControlPanel extends React.Component {
                         <option key={g.name} value={g.url}>{g.name}</option>
                     )}
                 </select>
+
                 <button id="load-button" onClick={_ => this.props.loadProgram(this.state.selectedUrl)}>Load</button>
-                <div className="slidercontainer">
+                <button onClick={this.props.onGo}>Go</button>
+                <button onClick={this.props.onBreak}>Break</button>
+
+                <div>
                     <div>
                         <label htmlFor="speed">Cycles/Frame:</label>
                     </div>
-                    <input type="range" className="slider" min="1" max="100" value={this.state.speed}
-                           onChange={e => {
-                               const speed = e.target.value;
-                               this.setState({speed});
-                               this.props.speedChanged(speed);
-                           }} />
+                    <select id="speed" value={this.state.speed} onChange={e => {
+                        const speed = e.target.value;
+                        this.setState({speed});
+                        this.props.speedChanged(speed);
+                    }}>
+                        <option value={1}>1 cycle/frame</option>
+                        <option value={3}>3 cycle/frame</option>
+                        <option value={7}>7 cycle/frame</option>
+                        <option value={15}>15 cycle/frame</option>
+                        <option value={50}>50 cycle/frame</option>
+                        <option value={100}>100 cycle/frame</option>
+                        <option value={500}>500 cycle/frame</option>
+                        <option value={1000}>1000 cycle/frame</option>
+                    </select>
                 </div>
             </div>);
     }
