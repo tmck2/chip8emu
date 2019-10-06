@@ -1,7 +1,7 @@
 import React from "react";
 
-const backgroundColor = "#9bbc0f";
-const foregroundColor = "#10203c";
+const background = {r: 0x9b, g: 0xbc, b: 0x0f };
+const foregroundColor = "#0f380f";
 const displayWidth = 640;
 const displayHeight = 320;
 const cols = 64;
@@ -19,6 +19,9 @@ export class Display extends React.Component {
     repaint() {
         const mem = this.chip.DisplayMemory;
 
+        this.ctx.fillStyle = this.grad;
+        this.ctx.fillRect(0, 0, displayWidth, displayHeight);
+
         for (let y=0; y<rows; y++)
         {
             for (let x=0; x<(cols>>3); x++)
@@ -26,10 +29,8 @@ export class Display extends React.Component {
                 for (let i=0; i<8; i++) {
                     if(mem[y*8+x] & (0x80 >> i)) {
                         this.ctx.fillStyle = foregroundColor;
-                    } else {
-                        this.ctx.fillStyle = backgroundColor;
+                        this.ctx.fillRect((x*8+i)*blockWidth, y*blockHeight, blockWidth, blockHeight);
                     }
-                    this.ctx.fillRect((x*8+i)*blockWidth, y*blockHeight, blockWidth, blockHeight);
                 }
             }
         }
@@ -37,6 +38,10 @@ export class Display extends React.Component {
 
     componentDidMount() {
         this.ctx = this.refs.display.getContext('2d');
+
+        this.grad = this.ctx.createLinearGradient(0, 0, 0, displayHeight);
+        this.grad.addColorStop(0.0, `rgba(${background.r},${background.g},${background.b},1)`);
+        this.grad.addColorStop(1.0, `rgba(${background.r * 0.8},${background.g * 0.8},${background.b * 0.8},1)`);
 
         this.chip.connectDisplay(this);
         this.repaint();
