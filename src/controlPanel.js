@@ -20,6 +20,7 @@ export class ControlPanel extends React.Component {
                 <button id="load-button" onClick={_ => this.props.loadProgram(this.state.selectedUrl)}>Load</button>
                 <button onClick={this.props.onGo}>Go</button>
                 <button onClick={this.props.onBreak}>Break</button>
+                <button onClick={this.props.onStep}>Step</button>
 
                 <div>
                     <div>

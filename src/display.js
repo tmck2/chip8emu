@@ -48,7 +48,7 @@ export class Display extends React.Component {
     }
 
     render() {
-        return <canvas ref="display" width={displayWidth} height={displayHeight}></canvas>;
+        return <canvas id="emu-display" ref="display" width={displayWidth} height={displayHeight}></canvas>;
     }
 }
 

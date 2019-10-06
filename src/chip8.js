@@ -59,20 +59,6 @@ export class Chip8 {
         ]);
     }
 
-    get state() {
-        const fmtreg = function(val, leadingZeros=2) {
-             return `${('0'.repeat(leadingZeros)+val.toString(16)).substr(-1*leadingZeros)}`;
-        }
-
-        const vregs = [...Array(16).keys()]
-            .map(i => `V${i.toString(16)}=0x${fmtreg(this.V[i])}`)
-            .join(" "); 
-        const regs = `I=0x${fmtreg(this.I,3)} DT=0x${fmtreg(this.DT)} ST=0x${fmtreg(this.ST)}`;
-        const ins = `${this.disasm(this.PC,1)[0]}`
-
-        return [vregs, regs, ins].join("\r\n");
-    }
-
     disasm(addr, len) {
         const result = [];
         for (let curr=addr; curr < addr+len; curr+=2) {
@@ -81,7 +67,7 @@ export class Chip8 {
 
             const machineCode = this.Memory[addr1] << 8 | this.Memory[addr2];
             const instruction = InstructionFactory.createFrom(machineCode);
-            result.push(`0x${curr.toString(16)} ${instruction.disasm()}`)
+            result.push((this.PC === curr ? "> " : "  ") + `0x${curr.toString(16)} ${instruction.disasm()}`)
         }
         return result;
     }
