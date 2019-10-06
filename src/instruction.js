@@ -187,7 +187,7 @@ export class InstructionFactory {
             let pixel = chip.Memory[chip.I+row];
             for (let col=0; col<8; col++) {
                 if((pixel & (0x80 >> col)) != 0) {
-                    const dstCol = chip.V[x.x];
+                    const dstCol = chip.V[x.x] & 0x3f;
                     const dstRow = chip.V[x.y];
                     let by = Math.floor((dstRow + row) * 8 + (dstCol + col) / 8);
                     let bi = (dstCol + col) % 8;
