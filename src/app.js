@@ -14,53 +14,47 @@ const programs = [
     { name: "Lunar Lander", url: "roms/lunar_lander.ch8" }
 ];
 
-const buzzer = new Buzzer();
-const chip = new Chip8(buzzer, keys);
-
-// for debugging
-window.chip = chip;
-
-const loadProgram = url => {
-    if (!url) return;
-    const oReq = new XMLHttpRequest();
-    oReq.open("GET", url, true);
-    oReq.responseType = "arraybuffer";
-
-    chip.singleStep = true;
-
-    oReq.onload = _ => {
-        let arrayBuffer = oReq.response;
-        if (arrayBuffer) {
-            let program = new Uint8Array(arrayBuffer);
-            chip.reset();
-            chip.load(0x200, program);
-            chip.singleStep = false;
-        }
-    };
-
-    oReq.send(null);
-};
-
-const updateSpeed = cyclesPerFrame => {
-    chip.cyclesPerFrame = cyclesPerFrame;
-};
-
 class App extends React.Component {
     constructor(props) {
         super(props);
 
-        this.chip = this.props.chip;
-        this.buzzer = this.props.buzzer;
+        this.buzzer = new Buzzer();
+        this.chip = new Chip8(this.buzzer, keys);
+    }
+
+    loadProgram = (url) => {
+        if (!url) return;
+        const oReq = new XMLHttpRequest();
+        oReq.open("GET", url, true);
+        oReq.responseType = "arraybuffer";
+
+        this.chip.singleStep = true;
+
+        oReq.onload = _ => {
+            let arrayBuffer = oReq.response;
+            if (arrayBuffer) {
+                let program = new Uint8Array(arrayBuffer);
+                this.chip.reset();
+                this.chip.load(0x200, program);
+                this.chip.singleStep = false;
+            }
+        };
+
+        oReq.send(null);
+    }
+
+    updateSpeed = (cyclesPerFrame) => {
+        this.chip.cyclesPerFrame = cyclesPerFrame;
     }
 
     render() {
        return (
             <div>
-               <Display chip={chip} />
-               <ControlPanel programs={programs} loadProgram={loadProgram} speedChanged={updateSpeed} />
+               <Display chip={this.chip} />
+               <ControlPanel programs={programs} loadProgram={this.loadProgram} speedChanged={this.updateSpeed} />
            </div>);
     }
 }
 
-ReactDOM.render(<App onLoadProgram={loadProgram} buzzer={buzzer} />, document.getElementById('app'));
+ReactDOM.render(<App />, document.getElementById('app'));
 
