@@ -13,7 +13,7 @@ const programs = [
     { name: "Invaders", url: "roms/INVADERS.dms" },
     { name: "Floppy Bird", url: "roms/floppybird.rom" },
     { name: "Lunar Lander", url: "roms/lunar_lander.ch8" },
-    { name: "Tron", url: "roms/Tron.ch8" }
+    { name: "Blinky", url: "roms/BLINKY.dms" }
 ];
 
 class App extends React.Component {
