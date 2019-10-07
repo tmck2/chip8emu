@@ -75,9 +75,11 @@ class App extends React.Component {
                     onGo={this.go}
                     onBreak={this.break}
                     onStep={this.step} />
-               <Display chip={this.chip} />
-               <Monitor chip={this.chip} />
-           </div>);
+                <div id="content">
+                   <Display chip={this.chip} />
+                   <Monitor chip={this.chip} />
+               </div>
+            </div>);
     }
 }
 
