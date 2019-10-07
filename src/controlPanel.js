@@ -11,13 +11,14 @@ export class ControlPanel extends React.Component {
                 <div>
                     <select id="program-select" 
                         value={this.props.selectedProgram}
-                        onChange={e => this.props.onProgramSelected(e.target.value)}>
+                        onChange={e => e.target.value >= 0 && this.props.onProgramSelected(e.target.value)}>
+
+                        <option key="default" value={-1}>Select a program</option>
 
                         {this.props.programs.map((g, ix) =>
                             <option key={g.name} value={ix}>{g.name}</option>
                         )}
                     </select>
-                    <button id="load-button" onClick={this.props.onLoadProgram}>Load</button>
                 </div>
 
                 <div>
@@ -38,10 +39,6 @@ export class ControlPanel extends React.Component {
                         <option value={500}>500 cycle/frame</option>
                         <option value={1000}>1000 cycle/frame</option>
                     </select>
-                </div>
-
-                <div>
-                    {this.props.programs[this.props.selectedProgram].instructions}
                 </div>
             </div>);
     }

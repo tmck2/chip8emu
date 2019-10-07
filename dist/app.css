@@ -1,14 +1,21 @@
 body {
-    margin:0;
-    padding:0;
+    margin: 0;
+    padding: 0;
     background: rgb(29, 50, 84);
+    font-family: Lucida Console, monospace;
 }
 
 #content {
+    margin: 1.0em;
+    padding-left: 1.5em;
+    color: white;
+}
+
+#emulator-container {
+    margin-top: 2em;
     width: 100%;
-    height: 100vh;
     display: flex;
-    flex-flow: row;
+    flex-flow: row wrap;
     align-items: center;
     justify-content: center;
 }
@@ -21,7 +28,7 @@ body {
     box-shadow: 0px 2px 4px #333;
     display: flex;
     flex-flow: row;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     color: white;
 }
@@ -30,10 +37,6 @@ body {
     padding: 0.5em 1em 0.5em 1em;
     border-left: 1px solid #333;
     color: black;
-}
-
-#control-panel div:nth-child(4) {
-    width: 35%;
 }
 
 canvas {

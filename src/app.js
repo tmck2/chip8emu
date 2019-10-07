@@ -25,11 +25,14 @@ class App extends React.Component {
         // for debugging
         window.chip = this.chip;
 
-        this.state = {selectedProgram: 0, speed: 15, showMonitor: false};
+        this.state = {selectedProgram: undefined, speed: 15, showMonitor: false};
     }
 
-    loadProgram = () => {
-        const program = programs[this.state.selectedProgram];
+    loadProgram = (ix) => {
+        if (!ix) return;
+
+        this.setState({selectedProgram: ix});
+        const program = programs[ix];
 
         const oReq = new XMLHttpRequest();
         oReq.open("GET", program.url, true);
@@ -45,11 +48,12 @@ class App extends React.Component {
                 let program = new Uint8Array(arrayBuffer);
                 this.chip.reset();
                 this.chip.load(0x200, program);
+                this.chip.singleStep = false;
             }
         };
 
         oReq.send(null);
-    }
+    };
 
     go = () => { this.chip.singleStep = false; };
 
@@ -60,16 +64,17 @@ class App extends React.Component {
     updateSpeed = (cyclesPerFrame) => {
         this.chip.cyclesPerFrame = cyclesPerFrame;
         this.setState({speed: cyclesPerFrame});
-    }
+    };
 
     render() {
+       const program = this.state.selectedProgram ? programs[this.state.selectedProgram] : {name: 'Chip8 Emulator', instructions: 'Select a program from the title bar above.' };
+
        return (
             <div>
                <ControlPanel
                     programs={programs}
                     selectedProgram={this.state.selectedProgram}
-                    onProgramSelected={ix => this.setState({selectedProgram:ix})}
-                    onLoadProgram={this.loadProgram}
+                    onProgramSelected={this.loadProgram}
                     speed={this.state.speed}
                     speedChanged={this.updateSpeed}
                     onGo={this.go}
@@ -77,8 +82,13 @@ class App extends React.Component {
                     onStep={this.step}
                     toggleMonitor={_ => this.setState({showMonitor:!this.state.showMonitor})}/>
                 <div id="content">
-                   <Display chip={this.chip} />
-                   {this.state.showMonitor && <Monitor chip={this.chip} />}
+                    <h1>{program.name}</h1>
+                    <hr />
+                    <p>{program.instructions}</p>
+                    <div id="emulator-container">
+                       <Display chip={this.chip} />
+                       {this.state.showMonitor && <Monitor chip={this.chip} />}
+                    </div>
                </div>
             </div>);
     }
