@@ -8,12 +8,11 @@ import {ControlPanel} from "./controlPanel";
 import {Monitor} from "./monitor";
 
 const programs = [
-    { name: "F8Z", url: "roms/f8z.ch8" },
-    { name: "Tetris", url: "roms/TETRIS.dms" },
-    { name: "Invaders", url: "roms/INVADERS.dms" },
-    { name: "Floppy Bird", url: "roms/floppybird.rom" },
-    { name: "Lunar Lander", url: "roms/lunar_lander.ch8" },
-    { name: "Blinky", url: "roms/BLINKY.dms", instructions: "A - Left, S - Right, E - Up, D - Down" }
+    { name: "Tetris",      url: "roms/TETRIS.dms",     speed: 15,  instructions: "W - Left, E - Right, Q - Rotate, A - Drop" },
+    { name: "Invaders",    url: "roms/INVADERS.dms",   speed: 50,  instructions: "Q - Left, E - Right, W - Shoot" },
+    { name: "Floppy Bird", url: "roms/floppybird.rom", speed: 50,  instructions: "W - Flap" },
+    { name: "F8Z",         url: "roms/f8z.ch8",        speed: 100, instructions: "A - Left, D - Right" },
+    { name: "Blinky",      url: "roms/BLINKY.dms",     speed: 50,  instructions: "A - Left, S - Right, 3 - Up, E - Down, V - Continue" }
 ];
 
 class App extends React.Component {
@@ -26,16 +25,19 @@ class App extends React.Component {
         // for debugging
         window.chip = this.chip;
 
-        this.state = {selectedProgram: undefined, speed: 15};
+        this.state = {selectedProgram: 0, speed: 15};
     }
 
-    loadProgram = (url) => {
-        if (!url) return;
+    loadProgram = () => {
+        const program = programs[this.state.selectedProgram];
+
         const oReq = new XMLHttpRequest();
-        oReq.open("GET", url, true);
+        oReq.open("GET", program.url, true);
         oReq.responseType = "arraybuffer";
 
         this.chip.singleStep = true;
+
+        this.updateSpeed(program.speed || 50);
 
         oReq.onload = _ => {
             let arrayBuffer = oReq.response;
@@ -65,7 +67,16 @@ class App extends React.Component {
             <div>
                <Display chip={this.chip} />
                <Monitor chip={this.chip} />
-               <ControlPanel programs={programs} loadProgram={this.loadProgram} speed={this.state.speed} speedChanged={this.updateSpeed} onGo={this.go} onBreak={this.break} onStep={this.step} />
+               <ControlPanel
+                    programs={programs}
+                    selectedProgram={this.state.selectedProgram}
+                    onProgramSelected={ix => this.setState({selectedProgram:ix})}
+                    onLoadProgram={this.loadProgram}
+                    speed={this.state.speed}
+                    speedChanged={this.updateSpeed}
+                    onGo={this.go}
+                    onBreak={this.break}
+                    onStep={this.step} />
            </div>);
     }
 }

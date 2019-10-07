@@ -3,21 +3,21 @@ import React from 'react';
 export class ControlPanel extends React.Component {
     constructor(props) {
         super(props);
-
-        this.state = {selectedUrl: ''}
     }
 
     render() {
         return (
             <div id="config-panel">
-                <select id="program-select" value={this.state.selectedUrl} onChange={e => this.setState({selectedUrl: e.target.value})}>
-                    <option key="default">Select a program</option>
-                    {this.props.programs.map(g =>
-                        <option key={g.name} value={g.url}>{g.name}</option>
+                <select id="program-select" 
+                    value={this.props.selectedProgram}
+                    onChange={e => this.props.onProgramSelected(e.target.value)}>
+
+                    {this.props.programs.map((g, ix) =>
+                        <option key={g.name} value={ix}>{g.name}</option>
                     )}
                 </select>
 
-                <button id="load-button" onClick={_ => this.props.loadProgram(this.state.selectedUrl)}>Load</button>
+                <button id="load-button" onClick={this.props.onLoadProgram}>Load</button>
                 <button onClick={this.props.onGo}>Go</button>
                 <button onClick={this.props.onBreak}>Break</button>
                 <button onClick={this.props.onStep}>Step</button>
@@ -36,6 +36,10 @@ export class ControlPanel extends React.Component {
                         <option value={500}>500 cycle/frame</option>
                         <option value={1000}>1000 cycle/frame</option>
                     </select>
+                </div>
+
+                <div>
+                    {this.props.programs[this.props.selectedProgram].instructions}
                 </div>
             </div>);
     }
