@@ -1,7 +1,7 @@
 body {
     margin:0;
     padding:0;
-    background: rgb(94, 0, 5);
+    background: rgb(29, 50, 84);
 }
 
 #content {
@@ -17,7 +17,8 @@ body {
     margin:0 0 1em 0;
     padding:0.1em;
     width: 100%;
-    background: linear-gradient(to bottom, #ff3019 0%,#cf0404 100%);
+    background: linear-gradient(to bottom, rgba(37,141,200,1) 0%,rgba(37,141,200,1) 100%);
+    box-shadow: 0px 2px 4px #333;
     display: flex;
     flex-flow: row;
     justify-content: center;
@@ -28,6 +29,7 @@ body {
 #control-panel div {
     padding: 0.5em 1em 0.5em 1em;
     border-left: 1px solid #333;
+    color: black;
 }
 
 #control-panel div:nth-child(4) {
