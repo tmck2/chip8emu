@@ -30,6 +30,10 @@ body {
     border-left: 1px solid #333;
 }
 
+#control-panel div:nth-child(4) {
+    width: 35%;
+}
+
 canvas {
     margin: 0.5em;
 }

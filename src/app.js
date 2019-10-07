@@ -25,7 +25,7 @@ class App extends React.Component {
         // for debugging
         window.chip = this.chip;
 
-        this.state = {selectedProgram: 0, speed: 15};
+        this.state = {selectedProgram: 0, speed: 15, showMonitor: false};
     }
 
     loadProgram = () => {
@@ -74,10 +74,11 @@ class App extends React.Component {
                     speedChanged={this.updateSpeed}
                     onGo={this.go}
                     onBreak={this.break}
-                    onStep={this.step} />
+                    onStep={this.step}
+                    toggleMonitor={_ => this.setState({showMonitor:!this.state.showMonitor})}/>
                 <div id="content">
                    <Display chip={this.chip} />
-                   <Monitor chip={this.chip} />
+                   {this.state.showMonitor && <Monitor chip={this.chip} />}
                </div>
             </div>);
     }
