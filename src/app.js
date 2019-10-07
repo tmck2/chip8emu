@@ -65,8 +65,6 @@ class App extends React.Component {
     render() {
        return (
             <div>
-               <Display chip={this.chip} />
-               <Monitor chip={this.chip} />
                <ControlPanel
                     programs={programs}
                     selectedProgram={this.state.selectedProgram}
@@ -77,6 +75,8 @@ class App extends React.Component {
                     onGo={this.go}
                     onBreak={this.break}
                     onStep={this.step} />
+               <Display chip={this.chip} />
+               <Monitor chip={this.chip} />
            </div>);
     }
 }

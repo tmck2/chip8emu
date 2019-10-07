@@ -1,7 +1,25 @@
 body {
-    color: white;
+    margin:0;
+    padding:0;
     height: 100vh;
-    background: rgb(0, 36, 0);
+    background: rgb(94, 0, 5);
+}
+
+#control-panel {
+    margin:0 0 1em 0;
+    padding:0.1em;
+    width: 100%;
+    background: linear-gradient(to bottom, #ff3019 0%,#cf0404 100%);
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+#control-panel div {
+    padding: 0.5em 1em 0.5em 1em;
+    border-left: 1px solid #333;
 }
 
 canvas {
