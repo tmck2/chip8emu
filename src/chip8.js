@@ -80,13 +80,14 @@ export class Chip8 {
 
         if (!this.singleStep)
         {
-            for (let i=0; i<this.cyclesPerFrame; i++) {
+            const n = Math.ceil((new Date() - this.start)/1000) * this.cyclesPerFrame;
+            for (let i=0; i<n; i++) {
                 this.stepEmulator(new Date()-this.start);
             }
         }
 
         this.start = new Date();
-        setTimeout(x => this.mainLoop.call(this), 1000/this.framesPerSecond);
+        requestAnimationFrame(x => this.mainLoop.call(this));
     }
 
     stepEmulator() {
