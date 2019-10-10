@@ -8,11 +8,12 @@ import {ControlPanel} from "./controlPanel";
 import {Monitor} from "./monitor";
 
 const programs = [
-    { name: "Tetris",      url: "roms/TETRIS.dms",     speed: 15,  instructions: "W - Left, E - Right, Q - Rotate, A - Drop" },
-    { name: "Invaders",    url: "roms/INVADERS.dms",   speed: 50,  instructions: "Q - Left, E - Right, W - Shoot" },
-    { name: "Floppy Bird", url: "roms/floppybird.rom", speed: 50,  instructions: "W - Flap" },
-    { name: "F8Z",         url: "roms/f8z.ch8",        speed: 100, instructions: "A - Left, D - Right" },
-    { name: "Blinky",      url: "roms/BLINKY.dms",     speed: 50,  instructions: "A - Left, S - Right, 3 - Up, E - Down, V - Continue" }
+    { name: "Tetris",                url: "roms/TETRIS.dms",     speed: 15,  instructions: "W - Left, E - Right, Q - Rotate, A - Drop" },
+    { name: "Invaders",              url: "roms/INVADERS.dms",   speed: 50,  instructions: "Q - Left, E - Right, W - Shoot" },
+    { name: "Floppy Bird",           url: "roms/floppybird.rom", speed: 50,  instructions: "W - Flap" },
+    { name: "F8Z",                   url: "roms/f8z.ch8",        speed: 100, instructions: "A - Left, D - Right" },
+    { name: "Blinky",                url: "roms/BLINKY.dms",     speed: 50,  instructions: "A - Left, S - Right, 3 - Up, E - Down, V - Continue" },
+    { name: "Byte Magazine Example", url: "roms/bytemagex.ch8",  speed: 3,   instructions: "The example game from 1976 Byte Magazine Volume 3 Number 12.  Press V to launch rocket."}
 ];
 
 class App extends React.Component {

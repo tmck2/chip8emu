@@ -4,7 +4,6 @@ export class Chip8 {
     constructor(buzzer, keys) {
         this.buzzer = buzzer;
         this.keys = keys;
-        this.framesPerSecond = 30;
         this.cyclesPerFrame = 15;
         this.reset();
         this.mainLoop();
