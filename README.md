@@ -32,9 +32,5 @@ Z X C V
 </pre>
 
 ## TODO
-* Show state of VM
-* Allow pausing and single-stepping
-* Show disassembly of instructions
-* Add sound
-* Add assembler / monitor ?
+* Fix sound
 * Allow remapping of keys
