@@ -6,6 +6,9 @@ import {Chip8} from './chip8';
 import {Display} from './display';
 import {ControlPanel} from "./controlPanel";
 import {Monitor} from "./monitor";
+import {Assembler} from "./assembler";
+
+window.assembler = new Assembler();
 
 const programs = [
     { name: "Tetris",                url: "roms/TETRIS.dms",     speed: 15,  instructions: "W - Left, E - Right, Q - Rotate, A - Drop" },
