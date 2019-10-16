@@ -11,11 +11,11 @@ start =
     statements: statement+ { return {labels,statements}; }
 
 statement
-    = _ label:label _ { labels[label] = pc; return label; }
+    = _ label:label _ { labels[label.name] = pc; return label; }
     / _ instruction:instruction _ { pc+=2; return instruction; }
 
 label =
-    label:name ':' { return { label } }
+    label:name ':' { return { name:label } }
 
 name = label:[a-zA-Z0-9_]* { return label.join(""); }
     
@@ -25,7 +25,7 @@ instruction
     / ret
     / ins:jp _ dest:(name / word) { return {ins,dest}; }
     / ins:call _ dest:(name / word) { return {ins,dest}; }
-    / ins:se _ arg1:reg _ ',' _ arg2:word { return {ins,reg,val}; }
+    / ins:se _ arg1:reg _ ',' _ arg2:word { return {ins,arg1,arg2}; }
     / ins:sne _ arg1:reg _ ',' _ arg2:word { return {ins,arg1,arg2}; } 
     / ins:se _ arg1:reg _ ',' _ arg2:reg { return {ins,arg1,arg2}; } 
     / ins:ld _ arg1:reg _ ',' _ arg2:word { return {ins,arg1,arg2}; }

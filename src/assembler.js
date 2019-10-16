@@ -9,6 +9,17 @@ export class Assembler {
 
                 return parser.parse(str);
             })
-            .then(console.log);
+            .then(x => {
+                console.log(x); 
+                return x;
+            })
+            .then(x => {
+                const {labels,statements} = x;
+                statements
+                    .filter(x => !x.name) // TODO: find a better way to filter labels
+                    .forEach(statement => {
+                        console.log(statement);
+                    });
+            });
     }
 }
