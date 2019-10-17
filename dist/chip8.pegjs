@@ -20,11 +20,10 @@ label =
 name = label:[a-zA-Z0-9_]* { return label.join(""); }
     
 instruction
-    = sys
-    / cls
+    = cls
     / ret
-    / ins:jp _ dest:(name / word) { return {ins,dest}; }
-    / ins:call _ dest:(name / word) { return {ins,dest}; }
+    / ins:jp _ arg1:(name / word) { return {ins,arg1}; }
+    / ins:call _ arg1:(name / word) { return {ins,arg1}; }
     / ins:se _ arg1:reg _ ',' _ arg2:word { return {ins,arg1,arg2}; }
     / ins:sne _ arg1:reg _ ',' _ arg2:word { return {ins,arg1,arg2}; } 
     / ins:se _ arg1:reg _ ',' _ arg2:reg { return {ins,arg1,arg2}; } 
@@ -51,7 +50,7 @@ drw = ('drw' / 'DRW') { return 'drw'; }
 skp = ('skp' / 'SKP') { return 'skp'; }
 sknp = ('sknp' / 'SKNP') { return 'sknp'; }
 
-reg = ('v' / 'V') num:[0-9a-f] { return ['reg', 'v' + num]; }
+reg = ('v' / 'V') num:[0-9a-f] { return ['reg', parseInt(num,16)]; }
 
 word = dec_word / hex_word
 dword = dec_dword / hex_dword
