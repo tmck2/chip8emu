@@ -65,10 +65,9 @@ export class Assembler {
                                     return acc.concat(
                                         fmt_word(0x8000 | stmt.arg1.val << 8 | stmt.arg2.val << 4)
                                     );
-                                } else if (stmt.arg1.typ === 'ireg' && stmt.arg2.typ === 'int') {
-                                    return acc.concat(
-                                        fmt_word(0xa000 | stmt.arg2.val)
-                                    );
+                                } else if (stmt.arg1.typ === 'ireg') {
+                                    const addr = stmt.arg2.typ ? stmt.arg2.val : labels[stmt.arg2];
+                                    return acc.concat(fmt_word(0xa000 | addr));
                                 } else if (stmt.arg1.typ === 'vreg' && stmt.arg2.typ === 'dt') {
                                     return acc.concat(
                                         fmt_word(0xf000 | stmt.arg1.val << 8 | 0x07)
@@ -107,7 +106,6 @@ export class Assembler {
                                 return acc.concat(
                                     fmt_word(0x8000 | stmt.arg1.val << 8 | stmt.arg2.val << 4 | 5)
                                 );
-                                break;
                             case 'add':
                                 if (stmt.arg1.typ === 'vreg' && stmt.arg2.typ === 'int') {
                                     return acc.concat(
@@ -127,49 +125,45 @@ export class Assembler {
                                 return acc.concat(
                                     fmt_word(0x8000 | stmt.arg1.val << 8 | stmt.arg2.val << 4 | 1)
                                 );
-                                break;
                             case 'and':
                                 return acc.concat(
                                     fmt_word(0x8000 | stmt.arg1.val << 8 | stmt.arg2.val << 4 | 2)
                                 );
-                                break;
                             case 'xor':
                                 return acc.concat(
                                     fmt_word(0x8000 | stmt.arg1.val << 8 | stmt.arg2.val << 4 | 3)
                                 );
-                                break;
                             case 'shr':
                                 return acc.concat(
                                     fmt_word(0x8000 | stmt.arg1.val << 8 | 6)
                                 );
-                                break;
                             case 'shl':
                                 return acc.concat(
                                     fmt_word(0x8000 | stmt.arg1.val << 8 | 0xe)
                                 );
-                                break;
                             case 'subn':
                                 return acc.concat(
                                     fmt_word(0x8000 | stmt.arg1.val << 8 | stmt.arg2.val << 4 | 7)
                                 );
-                                break;
                             case 'rnd':
                                 return acc.concat(
                                     fmt_word(0xc000 | stmt.arg1.val << 8 | stmt.arg2.val)
-                                )
+                                );
                             case 'drw':
                                 return acc.concat(
                                     fmt_word(0xd000 | stmt.arg1.val << 8 | stmt.arg2.val << 4
                                         | stmt.arg3.val)
-                                )
+                                );
                             case 'skp':
                                 return acc.concat(
                                     fmt_word(0xe000 | stmt.arg1.val << 8 | 0x9e)
-                                )
+                                );
                             case 'sknp':
                                 return acc.concat(
                                     fmt_word(0xe000 | stmt.arg1.val << 8 | 0xa1)
                                 )
+                            case 'db':
+                                return acc.concat(stmt.arg1.val);
                         }}, []);
             })
             .then(x => {

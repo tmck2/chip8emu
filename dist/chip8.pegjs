@@ -13,6 +13,7 @@ start =
 statement
     = _ label:label _ { labels[label.name] = pc; return label; }
     / _ instruction:instruction _ { pc+=2; return instruction; }
+    / _ db _ arg1:word _ { pc++; return {ins:'db',arg1} }
 
 label =
     label:name ':' { return { name:label } }
@@ -30,11 +31,15 @@ instruction
     / ins:sne _ arg1:vreg _ ',' _ arg2:word { return {ins,arg1,arg2}; }
     / ins:ld _ arg1:vreg _ ',' _ arg2:word { return {ins,arg1,arg2}; }
     / ins:ld _ arg1:vreg _ ',' _ arg2:vreg { return {ins,arg1,arg2}; }
-    / ins:ld _ arg1:ireg _ ',' _ arg2:dword { return {ins,arg1,arg2}; }
+    / ins:ld _ arg1:ireg _ ',' _ arg2:(name / dword) { return {ins,arg1,arg2}; }
     / ins:ld _ arg1:vreg _ ',' _ arg2:dt { return {ins,arg1,arg2}; }
     / ins:ld _ arg1:vreg _ ',' _ arg2:k { return {ins,arg1,arg2}; }
     / ins:ld _ arg1:dt _ ',' _ arg2:vreg { return {ins,arg1,arg2}; }
     / ins:ld _ arg1:st _ ',' _ arg2:vreg { return {ins,arg1,arg2}; }
+    / ins:ld _ arg1:f _ ',' _ arg2:vreg { return {ins,arg1,arg2}; }
+    / ins:ld _ arg1:b _ ',' _ arg2:vreg { return {ins,arg1,arg2}; }
+    / ins:ld _ arg1:ind _ ',' _ arg2:vreg { return {ins,arg1,arg2}; }
+    / ins:ld _ arg1:vreg _ ',' _ arg2:ind { return {ins,arg1,arg2}; }
     / ins:add _ arg1:vreg _ ',' _ arg2:word { return {ins,arg1,arg2}; }
     / ins:sub _ arg1:vreg _ ',' _ arg2:vreg { return {ins,arg1,arg2}; }
     / ins:or _ arg1:vreg _ ',' _ arg2:vreg { return {ins,arg1,arg2}; }
@@ -51,10 +56,6 @@ instruction
     / ins:skp _ arg1:vreg { return {ins,arg1}; }
     / ins:sknp _ arg1:vreg { return {ins,arg1}; }
     / ins:add _ arg1:ireg _ ',' _ arg2:vreg { return {ins,arg1,arg2}; }
-    / ins:ld _ arg1:f _ ',' _ arg2:vreg { return {ins,arg1,arg2}; }
-    / ins:ld _ arg1:b _ ',' _ arg2:vreg { return {ins,arg1,arg2}; }
-    / ins:ld _ arg1:ind _ ',' _ arg2:vreg { return {ins,arg1,arg2}; }
-    / ins:ld _ arg1:vreg _ ',' _ arg2:ind { return {ins,arg1,arg2}; }
 
 cls = ('cls' / 'CLS') { return 'cls'; }
 ret = ('ret' / 'RET') { return 'ret'; }
@@ -86,6 +87,8 @@ k = ('K' / 'k') { return { typ: 'k' } }
 f = ('F' / 'f') { return { typ: 'f' } }
 b = ('B' / 'b') { return { typ: 'b' } }
 ind = ('[' ireg ']') { typ: 'ind' }
+
+db = ('db' / 'DB')
 
 nibble = dec_nibble / hex_nibble
 word = dec_word / hex_word
