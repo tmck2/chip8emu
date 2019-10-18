@@ -33,7 +33,10 @@ export class Assembler {
                                     return acc.concat(fmt_word(0x1000 | addr));
                                 }
                             case 'call':
-                                return acc.concat(fmt_word(0x2000 | stmt.arg1));
+                                let addr;
+                                if (!Number.isInteger(stmt.arg1))
+                                    addr = labels[stmt.arg1];
+                                return acc.concat(fmt_word(0x2000 | addr));
                             case 'se':
                                 if (stmt.arg1.typ === 'vreg' && stmt.arg2.typ === 'int') {
                                     return acc.concat(
@@ -43,8 +46,9 @@ export class Assembler {
                                     return acc.concat(
                                         fmt_word(0x5000 | stmt.arg1.val << 8 | stmt.arg2.val << 4)
                                     );
+                                } else {
+                                    throw `error: ${stmt}`;
                                 }
-                                return acc;
                             case 'sne':
                                 if (stmt.arg1.typ === 'vreg' && stmt.arg2.typ === 'int') {
                                     return acc.concat(
@@ -54,8 +58,9 @@ export class Assembler {
                                     return acc.concat(
                                         fmt_word(0x9000 | stmt.arg1.val << 8 | stmt.arg2.val << 4)
                                     );
+                                } else {
+                                    throw `error: ${stmt}`;
                                 }
-                                break;
                             case 'ld':
                                 if (stmt.arg1.typ === 'vreg' && stmt.arg2.typ === 'int') {
                                     return acc.concat(
@@ -100,6 +105,8 @@ export class Assembler {
                                     return acc.concat(
                                         fmt_word(0xf000 | stmt.arg1.val << 8 | 0x65)
                                     );
+                                } else {
+                                    throw `error: ${stmt}`;
                                 }
                                 break;
                             case 'sub':
@@ -119,6 +126,8 @@ export class Assembler {
                                     return acc.concat(
                                         fmt_word(0xf000 | stmt.arg2.val << 8 | 0x1e)
                                     );
+                                } else {
+                                    throw `error: ${stmt}`;
                                 }
                                 break;
                             case 'or':

@@ -21,8 +21,8 @@ label =
 name = label:[a-zA-Z0-9_]* { return label.join(""); }
     
 instruction
-    = cls
-    / ret
+    = cls { return {ins:'cls'}; }
+    / ret { return {ins:'ret'}; }
     / ins:jp _ arg1:(name / word) { return {ins,arg1}; }
     / ins:jp _ arg1:v0 _ ',' _ arg2:dword { return {ins,arg1,arg2}; }
     / ins:call _ arg1:(name / word) { return {ins,arg1}; }
