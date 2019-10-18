@@ -1,11 +1,11 @@
 import peg from 'pegjs';
 
 export class Assembler {
-    fmt_word(val) {
-        return [(val & 0xff00) >> 8, val & 0x00ff];
-    }
-
     parse(str) {
+        const fmt_word = (val) => {
+            return [(val & 0xff00) >> 8, val & 0x00ff];
+        }
+
         return fetch('chip8.pegjs')
             .then(response => response.text())
             .then(grammar => {
@@ -18,49 +18,158 @@ export class Assembler {
                 return statements
                     .filter(stmt => !stmt.name)
                     .reduce((acc, stmt) => {
-                        console.log(stmt);
                         switch (stmt.ins) {
                             case 'cls':
                                 return acc.concat([0x00, 0xe0]);
                             case 'ret':
                                 return acc.concat([0x00, 0xee]);
                             case 'jp':
-                                let addr;
-                                if (!Number.isInteger(stmt.arg1))
-                                    addr = labels[stmt.arg1];
-                                return acc.concat(this.fmt_word(0x1000 | addr));
+                                if (stmt.arg1.typ === 'vreg' && stmt.arg1.val === 0 && stmt.arg2.typ === 'int') {
+                                    return acc.concat(fmt_word(0xb000 | addr));
+                                } else {
+                                    let addr;
+                                    if (!Number.isInteger(stmt.arg1))
+                                        addr = labels[stmt.arg1];
+                                    return acc.concat(fmt_word(0x1000 | addr));
+                                }
                             case 'call':
-                                return acc.concat(this.fmt_word(0x2000 | stmt.arg1));
+                                return acc.concat(fmt_word(0x2000 | stmt.arg1));
                             case 'se':
-                                if (stmt.arg1[0] === 'reg' && stmt.arg2[0] === 'int') {
+                                if (stmt.arg1.typ === 'vreg' && stmt.arg2.typ === 'int') {
                                     return acc.concat(
-                                        this.fmt_word(0x3000 | stmt.arg1[1] << 8 | stmt.arg2[1])
+                                        fmt_word(0x3000 | stmt.arg1.val << 8 | stmt.arg2.val)
                                     );
-                                } else if (stmt.arg1[0] === 'reg' && stmt.arg2[0] === 'reg') {
+                                } else if (stmt.arg1.typ === 'vreg' && stmt.arg2.typ === 'vreg') {
                                     return acc.concat(
-                                        this.fmt_word(0x5000 | stmt.arg1[1] << 8 | stmt.arg2[1] << 4)
+                                        fmt_word(0x5000 | stmt.arg1.val << 8 | stmt.arg2.val << 4)
                                     );
                                 }
                                 return acc;
                             case 'sne':
-                                if (stmt.arg1[0] === 'reg' && stmt.arg2[0] === 'int') {
+                                if (stmt.arg1.typ === 'vreg' && stmt.arg2.typ === 'int') {
                                     return acc.concat(
-                                        this.fmt_word(0x4000 | stmt.arg1[1] << 8 | stmt.arg2[1])
+                                        fmt_word(0x4000 | stmt.arg1.val << 8 | stmt.arg2.val)
+                                    );
+                                } else if (stmt.arg1.typ === 'vreg' && stmt.arg2.typ === 'int') {
+                                    return acc.concat(
+                                        fmt_word(0x9000 | stmt.arg1.val << 8 | stmt.arg2.val << 4)
                                     );
                                 }
                                 break;
                             case 'ld':
-                                if (stmt.arg1[0] === 'reg' && stmt.arg2[0] === 'int') {
+                                if (stmt.arg1.typ === 'vreg' && stmt.arg2.typ === 'int') {
                                     return acc.concat(
-                                        this.fmt_word(0x6000 | stmt.arg1[1] << 8 | stmt.arg2[1])
+                                        fmt_word(0x6000 | stmt.arg1.val << 8 | stmt.arg2.val)
+                                    );
+                                } else if (stmt.arg1.typ === 'vreg' && stmt.arg2.typ === 'vreg') {
+                                    return acc.concat(
+                                        fmt_word(0x8000 | stmt.arg1.val << 8 | stmt.arg2.val << 4)
+                                    );
+                                } else if (stmt.arg1.typ === 'ireg' && stmt.arg2.typ === 'int') {
+                                    return acc.concat(
+                                        fmt_word(0xa000 | stmt.arg2.val)
+                                    );
+                                } else if (stmt.arg1.typ === 'vreg' && stmt.arg2.typ === 'dt') {
+                                    return acc.concat(
+                                        fmt_word(0xf000 | stmt.arg1.val << 8 | 0x07)
+                                    );
+                                } else if (stmt.arg1.typ === 'vreg' && stmt.arg2.typ === 'k') {
+                                    return acc.concat(
+                                        fmt_word(0xf000 | stmt.arg1.val << 8 | 0x0a)
+                                    );
+                                } else if (stmt.arg1.typ === 'dt' && stmt.arg2.typ === 'vreg') {
+                                    return acc.concat(
+                                        fmt_word(0xf000 | stmt.arg2.val << 8 | 0x15)
+                                    );
+                                } else if (stmt.arg1.typ === 'st' && stmt.arg2.typ === 'vreg') {
+                                    return acc.concat(
+                                        fmt_word(0xf000 | stmt.arg2.val << 8 | 0x18)
+                                    );
+                                } else if (stmt.arg1.typ === 'f' && stmt.arg2.typ === 'vreg') {
+                                    return acc.concat(
+                                        fmt_word(0xf000 | stmt.arg2.val << 8 | 0x29)
+                                    );
+                                } else if (stmt.arg1.typ === 'b' && stmt.arg2.typ === 'vreg') {
+                                    return acc.concat(
+                                        fmt_word(0xf000 | stmt.arg2.val << 8 | 0x33)
+                                    );
+                                } else if (stmt.arg1.typ === 'ind' && stmt.arg2.typ === 'vreg') {
+                                    return acc.concat(
+                                        fmt_word(0xf000 | stmt.arg2.val << 8 | 0x55)
+                                    );
+                                } else if (stmt.arg1.typ === 'vreg' && stmt.arg2.typ === 'ind') {
+                                    return acc.concat(
+                                        fmt_word(0xf000 | stmt.arg1.val << 8 | 0x65)
                                     );
                                 }
                                 break;
                             case 'sub':
                                 return acc.concat(
-                                    this.fmt_word(0x8005 | stmt.arg1[1] << 8 | stmt.arg2[1] << 4)
+                                    fmt_word(0x8000 | stmt.arg1.val << 8 | stmt.arg2.val << 4 | 5)
                                 );
                                 break;
+                            case 'add':
+                                if (stmt.arg1.typ === 'vreg' && stmt.arg2.typ === 'int') {
+                                    return acc.concat(
+                                        fmt_word(0x7000 | stmt.arg1.val << 8 | stmt.arg2.val)
+                                    );
+                                } else if (stmt.arg1.typ === 'vreg' && stmt.arg2.typ === 'vreg') {
+                                    return acc.concat(
+                                        fmt_word(0x8000 | stmt.arg1.val << 8 | stmt.arg2.val << 4 | 4)
+                                    );
+                                } else if (stmt.arg1.typ === 'I' && stmt.arg2 === 'vreg') {
+                                    return acc.concat(
+                                        fmt_word(0xf000 | stmt.arg2.val << 8 | 0x1e)
+                                    );
+                                }
+                                break;
+                            case 'or':
+                                return acc.concat(
+                                    fmt_word(0x8000 | stmt.arg1.val << 8 | stmt.arg2.val << 4 | 1)
+                                );
+                                break;
+                            case 'and':
+                                return acc.concat(
+                                    fmt_word(0x8000 | stmt.arg1.val << 8 | stmt.arg2.val << 4 | 2)
+                                );
+                                break;
+                            case 'xor':
+                                return acc.concat(
+                                    fmt_word(0x8000 | stmt.arg1.val << 8 | stmt.arg2.val << 4 | 3)
+                                );
+                                break;
+                            case 'shr':
+                                return acc.concat(
+                                    fmt_word(0x8000 | stmt.arg1.val << 8 | 6)
+                                );
+                                break;
+                            case 'shl':
+                                return acc.concat(
+                                    fmt_word(0x8000 | stmt.arg1.val << 8 | 0xe)
+                                );
+                                break;
+                            case 'subn':
+                                return acc.concat(
+                                    fmt_word(0x8000 | stmt.arg1.val << 8 | stmt.arg2.val << 4 | 7)
+                                );
+                                break;
+                            case 'rnd':
+                                return acc.concat(
+                                    fmt_word(0xc000 | stmt.arg1.val << 8 | stmt.arg2.val)
+                                )
+                            case 'drw':
+                                return acc.concat(
+                                    fmt_word(0xd000 | stmt.arg1.val << 8 | stmt.arg2.val << 4
+                                        | stmt.arg3.val)
+                                )
+                            case 'skp':
+                                return acc.concat(
+                                    fmt_word(0xe000 | stmt.arg1.val << 8 | 0x9e)
+                                )
+                            case 'sknp':
+                                return acc.concat(
+                                    fmt_word(0xe000 | stmt.arg1.val << 8 | 0xa1)
+                                )
                         }}, []);
             })
             .then(x => {
