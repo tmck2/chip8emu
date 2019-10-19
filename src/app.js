@@ -25,11 +25,12 @@ class App extends React.Component {
 
         this.buzzer = new Buzzer();
         this.chip = new Chip8(this.buzzer, keys);
+        this.programSource = "";
 
         // for debugging
         window.chip = this.chip;
 
-        this.state = {selectedProgram: undefined, speed: 15, showMonitor: false};
+        this.state = {selectedProgram: undefined, speed: 15, showMonitor: true};
     }
 
     loadProgram = (ix) => {
@@ -70,6 +71,19 @@ class App extends React.Component {
         this.setState({speed: cyclesPerFrame});
     };
 
+    assembleProgram = () => {
+        const assembler = new Assembler();
+        assembler
+            .parse(this.state.programSource)
+            .then(prg => {
+                this.chip.Memory.splice(0x200, prg.length, ...prg);
+            });
+    }
+
+    programChanged = e => {
+        this.setState({programSource: e.target.value});
+    }
+
     render() {
        const program = this.state.selectedProgram ? programs[this.state.selectedProgram] : {name: 'Chip8 Emulator', instructions: 'Select a program from the title bar above.' };
 
@@ -92,6 +106,16 @@ class App extends React.Component {
                     <div id="emulator-container">
                        <Display chip={this.chip} />
                        {this.state.showMonitor && <Monitor chip={this.chip} />}
+                    </div>
+                    <button onClick={this.assembleProgram}>^ ^ ^</button>
+                    <div>
+                        <textarea
+                            cols={80}
+                            rows={20}
+                            value={this.state.program}
+                            onChange={this.programChanged}
+                            placeholder='Enter program here and press button above to assemble at address 0x200'
+                        />
                     </div>
                </div>
             </div>);

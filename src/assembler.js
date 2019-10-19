@@ -174,10 +174,6 @@ export class Assembler {
                             case 'db':
                                 return acc.concat(stmt.arg1.val);
                         }}, []);
-            })
-            .then(x => {
-                console.log(x.map(y => '$' + ('00' + y.toString(16)).substr(-2)));
-                return x;
             });
     }
 }
