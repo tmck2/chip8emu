@@ -15,7 +15,7 @@ export class Chip8 {
 
     load(address, bytes) {
         for(const by in bytes) {
-            this.Memory[address++] = bytes[by];
+            this.Memory[(address++) & 0xfff] = bytes[by];
         }
     }
 

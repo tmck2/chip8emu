@@ -194,12 +194,13 @@ export class InstructionFactory {
         chip.V[0xF] = 0;
         for (let row=0; row<x.n; row++) {
             let pixel = chip.Memory[chip.I+row];
+            const dstRow = chip.V[x.y];
             for (let col=0; col<8; col++) {
+                const dstCol = chip.V[x.x];
                 if((pixel & (0x80 >> col)) != 0) {
-                    const dstCol = chip.V[x.x] & 0x3f;
-                    const dstRow = chip.V[x.y];
-                    let by = Math.floor((dstRow + row) * 8 + (dstCol + col) / 8);
-                    let bi = (dstCol + col) % 8;
+                    let by =
+                        ((dstRow + row) << 3) + (((dstCol + col) & 0x3f) >> 3);
+                    let bi = (dstCol + col) & 7;
                     if (chip.DisplayMemory[by] & (0x80 >> bi)) {
                         chip.V[0xf] = 1;
                     }
