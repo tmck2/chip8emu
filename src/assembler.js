@@ -172,7 +172,7 @@ export class Assembler {
                                     fmt_word(0xe000 | stmt.arg1.val << 8 | 0xa1)
                                 )
                             case 'db':
-                                return acc.concat(stmt.arg1.val);
+                                return acc.concat(stmt.values);
                         }}, []);
             });
     }

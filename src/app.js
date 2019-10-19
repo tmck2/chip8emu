@@ -66,6 +66,11 @@ class App extends React.Component {
 
     step = () => { this.chip.stepEmulator(); };
 
+    reset = () => {
+        this.chip.reset();
+        this.setState({selectedProgram:undefined});
+    };
+
     updateSpeed = (cyclesPerFrame) => {
         this.chip.cyclesPerFrame = cyclesPerFrame;
         this.setState({speed: cyclesPerFrame});
@@ -98,6 +103,7 @@ class App extends React.Component {
                     onGo={this.go}
                     onBreak={this.break}
                     onStep={this.step}
+                    onReset={this.reset}
                     toggleMonitor={_ => this.setState({showMonitor:!this.state.showMonitor})}/>
                 <div id="content">
                     <h1>{program.name}</h1>

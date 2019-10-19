@@ -13,7 +13,7 @@ start =
 statement
     = _ label:label _ { labels[label.name] = pc; return label; }
     / _ instruction:instruction _ { pc+=2; return instruction; }
-    / _ db _ arg1:word _ { pc++; return {ins:'db',arg1} }
+    / _ db:('db' / 'DB') _ values:word+ { pc++; return {ins:'db',values:values.map(v => v.val)} }
 
 label =
     label:name ':' { return { name:label } }
@@ -88,10 +88,8 @@ f = ('F' / 'f') { return { typ: 'f' } }
 b = ('B' / 'b') { return { typ: 'b' } }
 ind = ('[' ireg ']') { typ: 'ind' }
 
-db = ('db' / 'DB')
-
 nibble = dec_nibble / hex_nibble
-word = dec_word / hex_word
+word = _ value:(dec_word / hex_word) _ { return value; }
 dword = dec_dword / hex_dword
 
 dec_nibble = num:(dec+) {

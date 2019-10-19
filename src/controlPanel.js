@@ -25,6 +25,7 @@ export class ControlPanel extends React.Component {
                     <button onClick={this.props.onGo}>Go</button>
                     <button onClick={this.props.onBreak}>Break</button>
                     <button onClick={this.props.onStep}>Step</button>
+                    <button onClick={this.props.onReset}>Reset</button>
                     <button onClick={this.props.toggleMonitor}>Monitor</button>
                 </div>
 
