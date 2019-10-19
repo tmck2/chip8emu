@@ -67,7 +67,7 @@ image:
     db $84
     db $fc
 </code>
-<pre>
+</pre>
 
 ## TODO
 * Fix sound
