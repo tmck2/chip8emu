@@ -82,6 +82,14 @@ class App extends React.Component {
             .parse(this.state.programSource)
             .then(prg => {
                 this.chip.Memory.splice(0x200, prg.length, ...prg);
+            })
+            .catch(e => {
+                if (e.location) {
+                    const {line,column} = e.location.start;
+                    alert(`${line}:${column}: ${e.message}`)
+                } else {
+                    alert(e.message);
+                }
             });
     }
 
