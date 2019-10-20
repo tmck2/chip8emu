@@ -173,6 +173,8 @@ export class Assembler {
                                 )
                             case 'db':
                                 return acc.concat(stmt.values);
+                            case 'comment':
+                                return acc;
                         }}, []);
             });
     }

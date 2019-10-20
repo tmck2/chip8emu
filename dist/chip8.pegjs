@@ -14,12 +14,13 @@ statement
     = _ label:label _ { labels[label.name] = pc; return label; }
     / _ instruction:instruction _ { pc+=2; return instruction; }
     / _ db:('db' / 'DB') _ values:word+ { pc++; return {ins:'db',values:values.map(v => v.val)} }
+    / _ $';' comment:[^\r\n]+ { return { ins:'comment', comment:comment.join("") } }
 
 label =
     label:name ':' { return { name:label } }
 
 name = label:[a-zA-Z0-9_]* { return label.join(""); }
-    
+
 instruction
     = cls { return {ins:'cls'}; }
     / ret { return {ins:'ret'}; }
@@ -121,4 +122,3 @@ hex = [0-9a-fA-F]
 dec = [0-9]
 
 _ = [ \t\r\n]*
-
