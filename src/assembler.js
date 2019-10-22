@@ -129,7 +129,7 @@ export class Assembler {
                                             return acc.concat(
                                                 fmt_word(0x8000 | stmt.arg1.val << 8 | stmt.arg2.val << 4 | 4)
                                             );
-                                        } else if (stmt.arg1.typ === 'I' && stmt.arg2 === 'vreg') {
+                                        } else if (stmt.arg1.typ === 'ireg' && stmt.arg2.typ === 'vreg') {
                                             return acc.concat(
                                                 fmt_word(0xf000 | stmt.arg2.val << 8 | 0x1e)
                                             );
