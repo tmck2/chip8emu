@@ -4,9 +4,10 @@
   "description": "## Description This is an emulator for the Chip8 architecture.",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --open",
-    "build": "webpack"
+    "start": "node server.js",
+    "build": "webpack",
+    "bundle": "webpack --config webpack.config.js",
+    "prestart": "npm run bundle"
   },
   "presets": [
     "@babel/preset-env",
@@ -20,14 +21,16 @@
     "@babel/preset-react": "^7.0.0",
     "babel": "^6.23.0",
     "babel-loader": "^8.0.6",
-    "webpack": "^4.40.2",
     "webpack-cli": "^3.3.9",
     "webpack-dev-server": "^3.8.1"
   },
   "dependencies": {
+    "webpack": "^4.41.2",
     "@babel/plugin-proposal-class-properties": "^7.5.5",
     "babel-preset-react": "^6.24.1",
+    "express": "^4.17.1",
     "pegjs": "^0.10.0",
+    "pug": "^2.0.4",
     "react": "^16.10.2",
     "react-dom": "^16.10.2"
   }
