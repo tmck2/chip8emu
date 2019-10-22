@@ -69,6 +69,109 @@ image:
 </code>
 </pre>
 
+Another sample program I've written that you can copy and paste into the assembler window:
+
+<pre>
+<code>
+; tinysketch.ch8
+;
+; I wrote this tiny utility to draw graphics for Chip-8 games.
+; Drive around using 'w','a','s','d' and update pixel by pressing 'e'.
+;
+; There's currently no way to save your work other than to manually extract the bytes in your browser's console
+; doing something like the following:
+;   > chip8.DisplayMemory
+
+ld v4, 0  ; x cursor position
+ld v5, 0  ; y cursor position
+ld v6, 0  ; counter
+
+loop:
+  ; get input on every other pass to ensure the blinking cursor
+  ; puts screen back in correct state (i.e. so cursor doesn't stomp
+  ; on your masterpiece)
+  ld v0, v6
+  ld v1, $1
+  and v0, v1
+  se v0, 1
+  call handleInput
+
+  ; draw cursor
+  ld i, cursor
+  drw v4, v5, 1
+
+  call replace
+
+  ; delay a bit
+  ld v0, 3
+  ld dt, v0
+  delay:
+    ld v0, dt
+    se v0, $0
+    jp delay
+
+  ; increment counter
+  add v6, 1
+
+  jp loop
+
+handleInput:
+  ; fire pressed
+  ld i, cursor
+  ld v0, $6
+  sknp v0
+  drw v4, v5, 1
+  waitForKeyUp:
+    sknp v0
+    jp waitForKeyUp
+
+  ; right pressed
+  ld v0, $9
+  sknp v0
+  add v4, 1
+
+  ; left pressed
+  ld v0, $7
+  sknp v0
+  add v4, $ff
+
+  ; down pressed
+  ld v0, $8
+  sknp v0
+  add v5, 1
+
+  ; up pressed
+  ld v0, $5
+  sknp v0
+  add v5, $ff
+
+  ; wrap cursor
+  ld v0, $3f
+  and v4, v0
+  ld v0, $1f
+  and v5, v0
+
+  ret
+
+; replace the pixel under the cursor
+replace:
+  ; get pixel at cursor location
+  ld i, screen
+
+  ; get byte offset for column
+  ld v0, v4
+  shr v0
+  shr v0
+  shr v0
+
+  ret
+
+cursor:
+  db $80
+  db $00
+</code>
+</pre>
+
 ## TODO
 * Fix sound
 * Allow remapping of keys
