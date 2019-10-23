@@ -1,3 +1,4 @@
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 
 module.exports = {
@@ -13,7 +14,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(js|jsx)$/i,
         exclude: /node_modules/,
         use: [
           {
@@ -22,13 +23,36 @@ module.exports = {
               presets: ['@babel/react'],
               plugins: ['@babel/plugin-proposal-class-properties']
             }
+          }]
+        },
+        {
+          test: /\.pegjs$/i,
+          exclude: /node_modules/,
+          loader: 'pegjs-loader'
+        },
+        {
+          test: /\.(dms|ch8|rom)$/i,
+          exclude: /node_modules/,
+          loader: 'file-loader',
+          options: {
+            name: '[path][name].[ext]',
           }
-        ]
-      }
-    ]
-  },
-  resolve: {
-    extensions: ['*', '.js', '.jsx']
-  }
+        },
+        {
+          test: /\.(css)$/i,
+          exclude: /node_modules/,
+          loader: 'file-loader',
+          options: {
+            name: '[name].[ext]',
+          }
+        },
+      ],
+    },
+    resolve: {
+      extensions: ['*', '.js', '.jsx']
+    },
+    plugins: [new HtmlWebpackPlugin({
+      template: 'src/index.ejs'
+    })]
 };
 

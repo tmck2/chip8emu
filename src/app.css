@@ -1,0 +1,66 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: rgb(29, 50, 84);
+    font-family: Lucida Console, monospace;
+}
+
+#content hr {
+    width: 100%;
+    pading: 0;
+    margin: 0;
+}
+
+#content {
+    margin: 1.0em;
+    padding-left: 1.5em;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#emulator-container {
+    margin-top: 2em;
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+#control-panel {
+    margin:0 0 1em 0;
+    padding:0.1em;
+    width: 100%;
+    background: linear-gradient(to bottom, rgba(37,141,200,1) 0%,rgba(37,141,200,1) 100%);
+    box-shadow: 0px 2px 4px #333;
+    display: flex;
+    flex-flow: row;
+    justify-content: flex-start;
+    align-items: center;
+    color: white;
+}
+
+#control-panel div {
+    padding: 0.5em 1em 0.5em 1em;
+    border-left: 1px solid #333;
+    color: black;
+}
+
+canvas {
+    margin: 0.5em;
+}
+
+#emu-display {
+    min-width: 800px;
+    height: 400px;
+    border: 1px solid white;
+}
+
+#disasm-display {
+    min-width: 400px;
+    height: 400px;
+    border: 1px solid white;
+}

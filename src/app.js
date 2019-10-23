@@ -8,6 +8,9 @@ import {ControlPanel} from "./controlPanel";
 import {Monitor} from "./monitor";
 import {Assembler} from "./assembler";
 
+require('./app.css');
+require('./roms.js');
+
 window.assembler = new Assembler();
 
 const programs = [
