@@ -2,6 +2,8 @@
 
 [Try It Out!](http://planettonster.com/chip8)
 
+![Emulator Screen Cap](https://raw.githubusercontent.com/tmck2/chip8emu/master/screencap.png)
+
 ## Description
 This is a virtual machine that excecutes programs written using the Chip8 pseudomachine language described in the 1978 Byte Magazine article memorialized [here](https://archive.org/details/byte-magazine-1978-12/page/n109/mode/2up) by Internet Archive. There are many other good sources of information about Chip8, but I found [Cowgod's Chip-8 Technical Reference](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM) to be particularly useful.
 
