@@ -1,6 +1,6 @@
 # Chip8 Emulator
 
-[Try It Out!](https://wonderful-ocean-024cc990f.2.azurestaticapps.net/)
+[Try It Out!](https://witty-smoke-06632f20f.2.azurestaticapps.net)
 
 ![Emulator Screen Cap](https://raw.githubusercontent.com/tmck2/chip8emu/master/screencap.png)
 
