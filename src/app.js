@@ -8,6 +8,7 @@ import {ControlPanel} from "./controlPanel";
 import {Monitor} from "./monitor";
 import {Assembler} from "./assembler";
 
+require('file-loader?name=[name].[ext]!../index.html');
 require('./app.css');
 require('./roms.js');
 
