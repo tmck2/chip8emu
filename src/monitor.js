@@ -13,6 +13,7 @@ export class Monitor extends React.Component {
     constructor(props) {
         super(props);
 
+        this.display = React.createRef();
         this.chip = props.chip;
     }
 
@@ -42,7 +43,7 @@ export class Monitor extends React.Component {
     }
 
     componentDidMount() {
-        this.ctx = this.refs.display.getContext('2d');
+        this.ctx = this.display.current.getContext('2d');
 
         this.grad = this.ctx.createLinearGradient(0, 0, 0, displayHeight);
         this.grad.addColorStop(0.0, `rgba(${background.r},${background.g},${background.b},1)`);
@@ -56,6 +57,6 @@ export class Monitor extends React.Component {
     }
 
     render() {
-        return <canvas id="disasm-display" ref="display" width={displayWidth} height={displayHeight}></canvas>;
+        return <canvas id="disasm-display" ref={this.display} width={displayWidth} height={displayHeight}></canvas>;
     }
 }
